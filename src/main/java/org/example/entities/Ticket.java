@@ -101,8 +101,8 @@ public class Ticket {
                 ", issueDate=" + issueDate +
                 ", expireDate=" + expireDate +
                 ", subscription=" + subscription +
-                ", user=" + user +
-                ", distributor=" + distributor +
+                ", user=" + (user != null ? user.getId() : "null") +
+                ", distributor=" + (distributor!= null ? distributor.getId() : "null") +
                 '}';
     }
 }

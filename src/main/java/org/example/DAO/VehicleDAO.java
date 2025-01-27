@@ -1,6 +1,5 @@
 package org.example.DAO;
 
-import org.example.entities.User;
 import org.example.entities.Vehicle;
 
 import javax.persistence.EntityManager;

@@ -14,6 +14,7 @@ public class User {
     private long id;
     private String name;
     private  String surname;
+    private String password;
     private String cardNumber;
     private boolean isAdmin;
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
@@ -23,11 +24,20 @@ public class User {
     public User() {
     }
 
-    public User(String name, String surname, String cardNumber, boolean isAdmin) {
+    public User(String name, String surname,String password, String cardNumber, boolean isAdmin) {
         this.name = name;
         this.surname = surname;
+        this.password = password;
         this.cardNumber = cardNumber;
         this.isAdmin = isAdmin;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public long getId() {
@@ -84,6 +94,7 @@ public class User {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", surname='" + surname + '\'' +
+                ", password='" + password + '\'' +
                 ", cardNumber='" + cardNumber + '\'' +
                 ", isAdmin=" + isAdmin +
                 ", tickets=" + tickets +

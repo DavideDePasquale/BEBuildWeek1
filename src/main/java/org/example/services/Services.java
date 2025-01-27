@@ -3,11 +3,16 @@ package org.example.services;
 import org.example.DAO.*;
 import org.example.Main;
 import org.example.entities.*;
+import org.example.enumeration.Subscription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.Query;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 public class Services {
 
@@ -26,7 +31,11 @@ public class Services {
 
     public Services(EntityManager em) {
         this.em = em;
-
+        this.vehicleDao = new VehicleDAO(em);
+        this.distributorDao = new DistributorDAO(em);
+        this.routeDao = new RouteDAO(em);
+        this.ticketDao = new TicketDAO(em);
+        this.userDao = new UserDAO(em);
     }
     public void addVehicle(Vehicle vehicle){
         try {
@@ -112,5 +121,70 @@ public class Services {
             log.error("Non è possibile visualizzare i tickets", e);
         }
     }
+    public void buyTicket(long userid, Subscription subscription, long distributor_id){
+        String code = codeGenerator(em);
+        LocalDateTime issueDate = LocalDateTime.now();
+        LocalDateTime expireDate;
+        System.out.println("CIAOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
+        if(subscription == Subscription.DAILY){
+            expireDate = issueDate.plusDays(1);
 
+        } else if(subscription == Subscription.MONTHLY){
+            expireDate = issueDate.plusDays(30);
+
+        } else {
+            expireDate = issueDate.plusDays(365);
+
+        }
+        System.out.println(code);
+        System.out.println(issueDate);
+        System.out.println(expireDate);
+        System.out.println(subscription);
+
+         try {
+             em.getTransaction().begin();
+             User user = em.find(User.class,userid);
+             System.out.println("SONO QUIIIIIIIIII");
+          /*   if(user == null){
+                 log.error("ID not found");
+                 em.getTransaction().rollback();
+                 return;
+             }
+             Distributor distributor = em.find(Distributor.class, distributor_id);
+             if(distributor == null){
+                 log.error("ID not found");
+                 em.getTransaction().rollback();
+                 return;
+             } */
+
+             Ticket ticket = new Ticket(code,issueDate,expireDate,subscription,user);
+             ticketDao.save(ticket);
+
+         } catch (Exception e) {
+             throw new RuntimeException(e);
+         }
+    }
+    public static boolean isCodeExist(EntityManager em, String code){
+        try {
+            Query q = em.createQuery("SELECT t FROM Ticket t WHERE t.code = :code", Ticket.class);
+            q.setParameter("code",code);
+            q.getResultList();
+            return true;
+        } catch (NoResultException e) {
+            return false;
+        }
+
+    }
+    public static String codeGenerator(EntityManager em){
+        String code;
+        boolean isUnique = false;
+        while (!isUnique){
+            code = UUID.randomUUID().toString().substring(0, 8);
+            if(!isCodeExist(em,code)){
+                isUnique = true;
+                return code;
+            }
+        }
+        return null;
+    }
 }
