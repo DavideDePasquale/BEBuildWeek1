@@ -4,6 +4,8 @@ import org.example.enumeration.VehicleStatus;
 import org.example.enumeration.VehicleType;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "vehicles")
@@ -17,6 +19,8 @@ public class Vehicle {
     private int capacity;
     @Enumerated(EnumType.STRING)
     private VehicleStatus status;
+    @OneToMany(mappedBy = "vehicle", cascade = CascadeType.ALL)
+    private List<Route> routes = new ArrayList<>();
 
     public Vehicle() {
     }

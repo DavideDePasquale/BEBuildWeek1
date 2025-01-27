@@ -3,6 +3,8 @@ package org.example.entities;
 import org.example.enumeration.DistributorType;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "distributors")
@@ -16,6 +18,8 @@ public class Distributor {
     private String name;
     private String location;
     private boolean isActive;
+    @OneToMany(mappedBy = "distributor", cascade =CascadeType.ALL )
+    private List<Ticket> tickets = new ArrayList<>();
 
     public Distributor() {
     }
@@ -67,6 +71,14 @@ public class Distributor {
         isActive = active;
     }
 
+    public List<Ticket> getTickets() {
+        return tickets;
+    }
+
+    public void setTickets(List<Ticket> tickets) {
+        this.tickets = tickets;
+    }
+
     @Override
     public String toString() {
         return "Distributor{" +
@@ -75,6 +87,7 @@ public class Distributor {
                 ", name='" + name + '\'' +
                 ", location='" + location + '\'' +
                 ", isActive=" + isActive +
+                ", tickets=" + tickets +
                 '}';
     }
 }

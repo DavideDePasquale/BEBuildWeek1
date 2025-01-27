@@ -12,6 +12,9 @@ public class Route {
     private String startPoint;
     private String endPoint;
     private int estimatedDuration;
+    @ManyToOne
+    @JoinColumn(name = "vehicle_id")
+    private Vehicle vehicle;
 
     public Route() {
     }

@@ -19,7 +19,11 @@ public class Ticket {
     @Enumerated(EnumType.STRING)
     private Subscription subscription;
     @ManyToOne
+    @JoinColumn(name = "user_id")
     private User user;
+    @ManyToOne
+    @JoinColumn(name = "distributor_id")
+    private Distributor distributor;
 
     public Ticket() {
     }
@@ -30,6 +34,14 @@ public class Ticket {
         this.expireDate = expireDate;
         this.subscription = subscription;
         this.user = user;
+    }
+
+    public Distributor getDistributor() {
+        return distributor;
+    }
+
+    public void setDistributor(Distributor distributor) {
+        this.distributor = distributor;
     }
 
     public long getId() {
@@ -89,6 +101,7 @@ public class Ticket {
                 ", expireDate=" + expireDate +
                 ", subscription=" + subscription +
                 ", user=" + user +
+                ", distributor=" + distributor +
                 '}';
     }
 }

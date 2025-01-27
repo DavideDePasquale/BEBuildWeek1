@@ -1,6 +1,8 @@
 package org.example.entities;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -14,6 +16,9 @@ public class User {
     private  String surname;
     private String cardNumber;
     private boolean isAdmin;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Ticket> tickets = new ArrayList<>();
+
 
     public User() {
     }
@@ -65,6 +70,14 @@ public class User {
         isAdmin = admin;
     }
 
+    public List<Ticket> getTickets() {
+        return tickets;
+    }
+
+    public void setTickets(List<Ticket> tickets) {
+        this.tickets = tickets;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -73,6 +86,7 @@ public class User {
                 ", surname='" + surname + '\'' +
                 ", cardNumber='" + cardNumber + '\'' +
                 ", isAdmin=" + isAdmin +
+                ", tickets=" + tickets +
                 '}';
     }
 }
