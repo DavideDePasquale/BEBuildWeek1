@@ -13,6 +13,7 @@ public class Ticket {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+    @Column(unique = true)
     private String code;
     private LocalDateTime issueDate;
     private LocalDateTime expireDate;
