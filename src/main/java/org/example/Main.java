@@ -1,16 +1,17 @@
 package org.example;
 
-import com.github.javafaker.Faker;
-import org.example.DAO.*;
+
 import org.example.entities.*;
 import org.example.enumeration.DistributorType;
 import org.example.enumeration.Subscription;
 import org.example.enumeration.VehicleStatus;
 import org.example.enumeration.VehicleType;
+import org.example.services.Services;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import java.sql.SQLOutput;
 import java.time.LocalDateTime;
 import java.util.Scanner;
 
@@ -21,32 +22,115 @@ public class Main
 
          EntityManagerFactory emf = Persistence.createEntityManagerFactory("BEBuildWeek1");
          EntityManager em =  emf.createEntityManager();
-         Faker faker = new Faker();
-      //   Scanner sc = new Scanner(System.in);
-        UserDAO userDao = new UserDAO(em);
-        VehicleDAO vehicleDao = new VehicleDAO(em);
-        DistributorDAO distributorDao = new DistributorDAO(em);
-        RouteDAO routeDao = new RouteDAO(em);
-        TicketDAO ticketDao = new TicketDAO(em);
+         Scanner sc = new Scanner(System.in);
+         Services services = new Services(em);
+         while (true){
+             System.out.println("""  
+                     1 - Add Vehicle
+                     2 - Add Distributor
+                     3 - Add Route
+                     4 - Add User
+                     5 - Add Ticket
+                     6 - Display Vehicles
+                     7 - Display Distributors
+                     8 - Display Routes
+                     9 - Display Users
+                     10 - Display Tickets   
+                     0 - Exit
+                     """);
 
+             int options = sc.nextInt();
+             sc.nextLine();
+             switch (options){
+                 case 1 : {
+                     System.out.print("Please enter Vehicle type (BUS or TRAM) : ");
+                     VehicleType type = VehicleType.valueOf(sc.nextLine().toUpperCase());
+                     System.out.print("Enter capacity : ");
+                     int capacity = sc.nextInt();
+                     sc.nextLine();
+                     System.out.print("Enter status ( MAINTENANCE or ACTIVE ) : ");
+                     VehicleStatus status = VehicleStatus.valueOf(sc.nextLine().toUpperCase());
+                     services.addVehicle(new Vehicle(type,capacity,status));
+                     break;
+                 } case 2 : {
+                     System.out.print("Enter Distributor Type ( AUTOMATIC or AUTHORIZED ) : ");
+                     DistributorType type = DistributorType.valueOf(sc.nextLine().toUpperCase());
+                     System.out.print("Enter Distributor name : ");
+                     String name = sc.nextLine();
+                     System.out.print("Enter Distributor location : ");
+                     String location = sc.nextLine();
+                     System.out.print("Is Active? (true or false) : ");
+                     boolean isActive = sc.nextBoolean();
+                     sc.nextLine();
+                     services.addDistributor(new Distributor(type,name,location,isActive));
+                     break;
+                 } case 3 : {
+                     System.out.print("Enter start point : ");
+                     String startPoint = sc.nextLine();
+                     System.out.print("Enter end point : ");
+                     String endPoint = sc.nextLine();
+                     System.out.print("Estimated duration : ");
+                     int duration = sc.nextInt();
+                     sc.nextLine();
+                     services.addRoute(new Route(startPoint,endPoint,duration));
+                     break;
+                 } case 4 : {
+                     System.out.print("Enter User name : ");
+                     String name = sc.nextLine();
+                     System.out.print("Enter user surname : ");
+                     String surname = sc.nextLine();
+                     System.out.print("Enter Card number : ");
+                     String cardNumber = sc.nextLine();
+                     System.out.print("Is Admin? (True or False) : ");
+                     boolean isAdmin = sc.nextBoolean();
+                     sc.nextLine();
+                     services.addUser(new User(name,surname,cardNumber,isAdmin));
+                     break;
+                 } case 5 : {
+                     System.out.print("This value is Unique");
+                     System.out.print("Enter Ticket code : ");
+                     String code = sc.nextLine();
+                     System.out.print("Enter issue date : ");
+                     LocalDateTime issueDate = LocalDateTime.parse(sc.nextLine());
+                     System.out.print("Enter expire Date : ");
+                     LocalDateTime expireDate = LocalDateTime.parse(sc.nextLine());
+                     System.out.print("Enter subscription type ( MONTLY, DAITLY or ANNUAL ) : ");
+                     Subscription type = Subscription.valueOf(sc.nextLine().toUpperCase());
+                     System.out.print("Enter User id : ");
+                     long userId = sc.nextLong();
+                     sc.nextLine();
+                     User user = em.find(User.class,userId);
+                     if (user == null){
+                         System.out.println("User not found!");
+                         break;
+                     }
+                     services.addTicket(new Ticket(code,issueDate,expireDate,type,user));
+                     break;
+                 } case 6 : {
+                     services.displayVehicles();
+                     break;
+                 } case 7 : {
+                     services.displayDistributors();
+                     break;
+                 } case 8 : {
+                     services.displayRoutes();
+                     break;
+                 } case 9 : {
+                     services.displayUsers();
+                     break;
+                 } case 10 : {
+                     services.displayTickets();
+                     break;
+                 } case 0 : {
+                     em.close();
+                     emf.close();
+                     break;
+                 } default: {
+                     System.out.println("Invalid Options! Write again");
+                 }
+             }
+         }
 
-//        User user1 = new User("Mahdi","Nazari","1234AB234",true);
-       Vehicle v1 = new Vehicle(VehicleType.BUS,50, VehicleStatus.ACTIVE);
-//
-//        userDao.save(user1);
-
-        Distributor d1 = new Distributor(DistributorType.AUTOMATIC,"Tabaccheria 127","Bari", true);
-        distributorDao.save(d1);
-
-        Route r1 = new Route("Bari","Roma",240);
-        r1.setVehicle(v1);
-        vehicleDao.save(v1);
-        routeDao.save(r1);
-
-        Ticket t1 = new Ticket("ACcccc12345", LocalDateTime.of(2025,1,24,10,40),LocalDateTime.of(2025,1,24,10,40).plusDays(30), Subscription.MONTHLY,userDao.getFinById(1));
-
-        t1.setDistributor(d1);
-        ticketDao.save(t1);
 
 
 
