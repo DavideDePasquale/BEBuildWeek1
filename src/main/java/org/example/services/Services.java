@@ -12,13 +12,13 @@ import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Scanner;
 import java.util.UUID;
 
 public class Services {
 
-    // 1) Definiamo logger
-   private static Logger log = LoggerFactory.getLogger(Main.class);
-    // 2) Importare classi dentro services
+    private static Logger log = LoggerFactory.getLogger(Services.class);
+
     private EntityManager em;
     private VehicleDAO vehicleDao;
     private DistributorDAO distributorDao;
@@ -28,7 +28,6 @@ public class Services {
 
     public Services() {
     }
-
     public Services(EntityManager em) {
         this.em = em;
         this.vehicleDao = new VehicleDAO(em);
@@ -49,7 +48,6 @@ public class Services {
         try {
             distributorDao.save(distributor);
             log.info("Hai aggiunto un nuovo distrubutore");
-
         } catch (Exception e) {
             log.error("Non è stato possibile aggiungere il distributore. Controlla l'errore -> ", e);
         }
@@ -58,7 +56,6 @@ public class Services {
         try {
             userDao.save(user);
             log.info("Hai aggiunto un nuovo user");
-
         } catch (Exception e) {
             log.error("Non è stato possibile aggiungere l'user . Controlla l'errore -> ", e);
         }
@@ -67,7 +64,6 @@ public class Services {
         try {
             routeDao.save(route);
             log.info("Hai aggiunto una nuova rotta");
-
         } catch (Exception e) {
             log.error("Non è stato possibile aggiungere la rotta. Controlla l'errore -> ", e);
         }
@@ -76,7 +72,6 @@ public class Services {
         try {
             ticketDao.save(ticket);
             log.info("Hai aggiunto un nuovo ticket");
-
         } catch (Exception e) {
             log.error("Non è stato possibile aggiungere il ticket. Controlla l'errore -> ", e);
         }
@@ -105,7 +100,7 @@ public class Services {
             log.error("Non è possibile visualizzare gli users", e);
         }
     }
-    public void displayRoutes(){
+    public  void displayRoutes(EntityManager em){
         try {
             List<Route> routes = em.createQuery("FROM Route", Route.class).getResultList();
             routes.forEach(System.out::println);
@@ -121,49 +116,41 @@ public class Services {
             log.error("Non è possibile visualizzare i tickets", e);
         }
     }
-    public void buyTicket(long userid, Subscription subscription, long distributor_id){
+    public void buyTicket(long userid, Subscription subscription, long distributor_id, Scanner sc){
         String code = codeGenerator(em);
-        System.out.println("CODEEEEE" + code);
         LocalDateTime issueDate = LocalDateTime.now();
         LocalDateTime expireDate;
-        System.out.println("CIAOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
         if(subscription == Subscription.DAILY){
             expireDate = issueDate.plusDays(1);
-
         } else if(subscription == Subscription.MONTHLY){
             expireDate = issueDate.plusMonths(1);
-
         } else {
             expireDate = issueDate.plusYears(1);
-
         }
-        System.out.println(code);
-        System.out.println(issueDate);
-        System.out.println(expireDate);
-        System.out.println(subscription);
-
          try {
              em.getTransaction().begin();
              User user = em.find(User.class,userid);
              Distributor distributor = em.find(Distributor.class,distributor_id);
-             System.out.println("SONO QUIIIIIIIIII");
-          /*   if(user == null){
+            if(user == null){
                  log.error("ID not found");
                  em.getTransaction().rollback();
                  return;
              }
-             Distributor distributor = em.find(Distributor.class, distributor_id);
              if(distributor == null){
                  log.error("ID not found");
                  em.getTransaction().rollback();
                  return;
-             } */
+             }
 
-             Ticket ticket = new Ticket(code,issueDate,expireDate,subscription,user);
+             displayRoutes(em);
+             System.out.println("Please, enter Route id : ");
+             int option = Integer.parseInt(sc.nextLine());
+             Route route = routeDao.getFinById(option);
+             Ticket ticket = new Ticket(code,issueDate,expireDate,subscription,user,route);
              ticket.setDistributor(distributor);
              em.persist(ticket);
+             log.info("CONGRATULATIONS, YOU BOUGHT TICKET!! ❤️");
              em.getTransaction().commit();
-
          } catch (Exception e) {
              throw new RuntimeException(e);
          }
@@ -172,8 +159,6 @@ public class Services {
             Query q = em.createQuery("SELECT t FROM Ticket t WHERE t.code = :code", Ticket.class);
             q.setParameter("code",code);
             return !q.getResultList().isEmpty();
-
-
     }
     public static String codeGenerator(EntityManager em){
         String code;
@@ -222,5 +207,4 @@ public class Services {
         em.remove(distributor);
         em.getTransaction().commit();
     }
-
 }

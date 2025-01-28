@@ -2,7 +2,9 @@ package org.example;
 
 
 import antlr.CodeGenerator;
+import org.example.DAO.DistributorDAO;
 import org.example.DAO.RouteDAO;
+import org.example.DAO.UserDAO;
 import org.example.entities.*;
 import org.example.enumeration.DistributorType;
 import org.example.enumeration.Subscription;
@@ -13,13 +15,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.persistence.*;
-import java.sql.SQLOutput;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Scanner;
+
+import static org.example.services.Services.codeGenerator;
 
 
 public class Main {
     private static final Logger log = LoggerFactory.getLogger(Main.class);
+    private static Services services;
+
 
     public static void main(String[] args) {
 
@@ -36,16 +42,7 @@ public class Main {
             if (loggedinUser.isAdmin()) {
                 adminMenu(sc,services,em);
             }  else {
-                System.out.println("Welcome User " + loggedinUser.getName());
-                System.out.print("Enter Subscription type ( DAILY, MONTHLY or ANNUAL ) : ");
-                Subscription subscription = Subscription.valueOf(sc.nextLine().toUpperCase());
-                System.out.print("Enter Distributor id : ");
-                long distributorId = sc.nextLong();
-                sc.nextLine();
-                long id = loggedinUser.getId();
-                services.buyTicket(id, subscription, distributorId);
-                log.info("Hai appena comprato un biglietto! Buon viaggio");
-                //break;
+             userMenu(sc,loggedinUser,services,em);
             }
         } else {
             System.out.print("Login failed");
@@ -67,7 +64,7 @@ public class Main {
         sc.nextLine();
         services.deleteRoute(em, id);
         System.out.println("Route is deleted!");
-        return;
+
     }
 
     private static void deleteTicket(Scanner sc, Services services, EntityManager em) {
@@ -76,7 +73,7 @@ public class Main {
         sc.nextLine();
         services.deleteTicket(em, id);
         System.out.println("Ticket is deleted!");
-        return;
+
     }
 
     private static void deleteDistributor(Scanner sc, Services services, EntityManager em) {
@@ -85,7 +82,7 @@ public class Main {
         sc.nextLine();
         services.deleteDistributor(em, id);
         System.out.println("Distributor is deleted!");
-        return;
+
     }
 
     private static void deleteUser(Scanner sc, Services services, EntityManager em) {
@@ -94,19 +91,18 @@ public class Main {
         sc.nextLine();
         services.deleteUser(em, id);
         System.out.println("User is deleted!");
-        return;
+
     }
 
     private static void addTicket(Scanner sc, EntityManager em, Services services) {
-        System.out.print("This value is Unique");
-        System.out.print("Enter Ticket code : ");
-        String code = sc.nextLine();
+        RouteDAO routeDao = new RouteDAO(em);
+
+        String code = codeGenerator(em);
         System.out.print("Enter issue date (yyyy-MM-dd'T'HH:mm) : ");
         LocalDateTime issueDate = LocalDateTime.parse(sc.nextLine());
         System.out.print("Enter expire Date (yyyy-MM-dd'T'HH:mm) : ");
         LocalDateTime expireDate = LocalDateTime.parse(sc.nextLine());
-        System.out.print("Enter subscription type ( MONTHLY, DAITLY or ANNUAL ) : ");
-        Subscription type = Subscription.valueOf(sc.nextLine().toUpperCase());
+        services.displayUsers();
         System.out.print("Enter User id : ");
         long userId = sc.nextLong();
         sc.nextLine();
@@ -115,8 +111,15 @@ public class Main {
             System.out.println("User not found!");
             return;
         }
-        services.addTicket(new Ticket(code, issueDate, expireDate, type, user));
-        return;
+        services.displayRoutes(em);
+        System.out.println("Please, enter Route id : ");
+        int option = Integer.parseInt(sc.nextLine());
+        Route route = routeDao.getFinById(option);
+        services.displayDistributors();
+        System.out.println("Please, enter Distributor id : ");
+        int dis_id = Integer.parseInt(sc.nextLine());
+        Distributor distributor = em.find(Distributor.class,dis_id);
+        services.addTicket(new Ticket(code,issueDate,expireDate,user,distributor,route));
     }
 
     private static void addUser(Scanner sc, Services services) {
@@ -132,7 +135,7 @@ public class Main {
         boolean isAdmin = sc.nextBoolean();
         sc.nextLine();
         services.addUser(new User(name, surname, password, cardNumber, isAdmin));
-        return;
+
     }
 
     private static void addRoute(Scanner sc, Services services) {
@@ -200,12 +203,12 @@ public class Main {
             try {
 
                 System.out.println("""
-                          1 - Add Vehicle
-                          2 - Add Distributor
-                          3 - Add Route
-                          4 - Add User
-                          5 - Add Ticket
-                          0 - Back
+                        1 - Add Vehicle
+                        2 - Add Distributor
+                        3 - Add Route
+                        4 - Add User
+                        5 - Add Ticket
+                        0 - Back
                         """);
                 int option = Integer.parseInt(sc.nextLine());
                 switch (option) {
@@ -300,8 +303,7 @@ public class Main {
                         5 - Display Tickets   
                         0 - Back
                         """);
-                int options = sc.nextInt();
-                sc.nextLine();
+                int options = Integer.parseInt(sc.nextLine());
                 switch (options) {
                     case 1: {
                         services.displayVehicles();
@@ -312,7 +314,7 @@ public class Main {
                         break;
                     }
                     case 3: {
-                        services.displayRoutes();
+                        services.displayRoutes(em);
                         break;
                     }
                     case 4: {
@@ -364,5 +366,57 @@ public class Main {
             }
         }
     }
+    public static void userMenu(Scanner sc, User loggedinUser, Services services, EntityManager em){
+        while (true){
+            try {
+                System.out.println("""
+                1 - BUY TICKET
+                2 - SHOW TICKETS
+                0 - EXIT
+                """);
+                int option = Integer.parseInt(sc.nextLine());
+                if ( option == 1 ){
+                    buyTicket(sc,loggedinUser,services);
+                } else if ( option == 2 ){
+                    displayUserTickets(em,loggedinUser);
+                } else if ( option == 0 ){
+                    log.info("BYE BYE");
+                    break;
+                } else {
+                    log.error("INVALID OPTION!");
+                }
+            } catch (RuntimeException e) {
+               log.error("SELECT NUMBER BETWEEN 1 and 2 and for EXIT insert 0");
+            }
+        }
 
+    }
+
+
+
+    public static void buyTicket(Scanner sc, User loggedinUser, Services services){
+        System.out.println("Welcome User " + loggedinUser.getName());
+        System.out.print("Enter Subscription type ( DAILY, MONTHLY or ANNUAL ) : ");
+        Subscription subscription = Subscription.valueOf(sc.nextLine().toUpperCase());
+        System.out.print("Enter Distributor id : ");
+        long distributorId = sc.nextLong();
+        sc.nextLine();
+        long id = loggedinUser.getId();
+        services.buyTicket(id, subscription, distributorId,sc);
+    }
+    public static void displayUserTickets(EntityManager em, User loggedinUser){
+        try {
+            Query q = em.createQuery("SELECT t FROM Ticket t WHERE t.user.id = :userId", Ticket.class);
+            q.setParameter("userId",loggedinUser.getId());
+            List<Ticket> listTickets = q.getResultList();
+            if(listTickets.isEmpty()) {
+                System.out.println("NO TICKET FOUND FOR THIS USER");
+            } else {
+                System.out.println("TICKETS FOR USER : ");
+                listTickets.forEach(System.out::println);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

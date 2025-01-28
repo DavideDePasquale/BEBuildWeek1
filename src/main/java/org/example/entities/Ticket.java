@@ -25,16 +25,30 @@ public class Ticket {
     @ManyToOne
     @JoinColumn(name = "distributor_id")
     private Distributor distributor;
+    @ManyToOne
+    @JoinColumn(name = "route_id")
+    private Route route;
 
     public Ticket() {
     }
 
-    public Ticket(String code, LocalDateTime issueDate, LocalDateTime expireDate, Subscription subscription, User user) {
+    public Ticket(String code, LocalDateTime issueDate, LocalDateTime expireDate, Subscription subscription, User user,Route route) {
         this.code = code;
         this.issueDate = issueDate;
         this.expireDate = expireDate;
         this.subscription = subscription;
         this.user = user;
+        this.route = route;
+
+    }
+
+    public Ticket(String code, LocalDateTime issueDate, LocalDateTime expireDate, User user, Distributor distributor, Route route) {
+        this.code = code;
+        this.issueDate = issueDate;
+        this.expireDate = expireDate;
+        this.user = user;
+        this.distributor = distributor;
+        this.route = route;
     }
 
     public Distributor getDistributor() {
@@ -93,6 +107,14 @@ public class Ticket {
         this.subscription = subscription;
     }
 
+    public Route getRoute() {
+        return route;
+    }
+
+    public void setRoute(Route route) {
+        this.route = route;
+    }
+
     @Override
     public String toString() {
         return "Ticket{" +
@@ -101,8 +123,9 @@ public class Ticket {
                 ", issueDate=" + issueDate +
                 ", expireDate=" + expireDate +
                 ", subscription=" + subscription +
-                ", user=" + (user != null ? user.getId() : "null") +
-                ", distributor=" + (distributor!= null ? distributor.getId() : "null") +
+                ", user=" + user +
+                ", distributor=" + distributor +
+                ", route=" + route +
                 '}';
     }
 }

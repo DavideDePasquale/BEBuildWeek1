@@ -1,6 +1,7 @@
 package org.example.entities;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "routes")
@@ -15,6 +16,8 @@ public class Route {
     @ManyToOne
     @JoinColumn(name = "vehicle_id")
     private Vehicle vehicle;
+    @OneToMany(mappedBy = "route",cascade = CascadeType.ALL)
+    private List<Ticket> tickets;
 
     public Route() {
     }
