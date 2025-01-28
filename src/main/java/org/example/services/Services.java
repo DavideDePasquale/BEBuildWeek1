@@ -123,6 +123,7 @@ public class Services {
     }
     public void buyTicket(long userid, Subscription subscription, long distributor_id){
         String code = codeGenerator(em);
+        System.out.println("CODEEEEE" + code);
         LocalDateTime issueDate = LocalDateTime.now();
         LocalDateTime expireDate;
         System.out.println("CIAOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
@@ -130,10 +131,10 @@ public class Services {
             expireDate = issueDate.plusDays(1);
 
         } else if(subscription == Subscription.MONTHLY){
-            expireDate = issueDate.plusDays(30);
+            expireDate = issueDate.plusMonths(1);
 
         } else {
-            expireDate = issueDate.plusDays(365);
+            expireDate = issueDate.plusYears(1);
 
         }
         System.out.println(code);
@@ -144,6 +145,7 @@ public class Services {
          try {
              em.getTransaction().begin();
              User user = em.find(User.class,userid);
+             Distributor distributor = em.find(Distributor.class,distributor_id);
              System.out.println("SONO QUIIIIIIIIII");
           /*   if(user == null){
                  log.error("ID not found");
@@ -158,21 +160,19 @@ public class Services {
              } */
 
              Ticket ticket = new Ticket(code,issueDate,expireDate,subscription,user);
-             ticketDao.save(ticket);
+             ticket.setDistributor(distributor);
+             em.persist(ticket);
+             em.getTransaction().commit();
 
          } catch (Exception e) {
              throw new RuntimeException(e);
          }
     }
     public static boolean isCodeExist(EntityManager em, String code){
-        try {
             Query q = em.createQuery("SELECT t FROM Ticket t WHERE t.code = :code", Ticket.class);
             q.setParameter("code",code);
-            q.getResultList();
-            return true;
-        } catch (NoResultException e) {
-            return false;
-        }
+            return !q.getResultList().isEmpty();
+
 
     }
     public static String codeGenerator(EntityManager em){
@@ -187,4 +187,40 @@ public class Services {
         }
         return null;
     }
+    public static void deleteUser(EntityManager em, long id){
+        User user = new User();
+        em.getTransaction().begin();
+        user = em.find(User.class,id);
+        em.remove(user);
+        em.getTransaction().commit();
+    }
+    public static void deleteRoute(EntityManager em, long id){
+        Route route = new Route();
+        em.getTransaction().begin();
+        route = em.find(Route.class,id);
+        em.remove(route);
+        em.getTransaction().commit();
+    }
+    public static void deleteTicket(EntityManager em, long id){
+        Ticket ticket = new Ticket();
+        em.getTransaction().begin();
+        ticket = em.find(Ticket.class,id);
+        em.remove(ticket);
+        em.getTransaction().commit();
+    }
+    public static void deleteVehicle(EntityManager em, long id){
+        Vehicle vehicle = new Vehicle();
+        em.getTransaction().begin();
+        vehicle = em.find(Vehicle.class,id);
+        em.remove(vehicle);
+        em.getTransaction().commit();
+    }
+    public static void deleteDistributor(EntityManager em, long id){
+        Distributor distributor = new Distributor();
+        em.getTransaction().begin();
+        distributor = em.find(Distributor.class,id);
+        em.remove(distributor);
+        em.getTransaction().commit();
+    }
+
 }
