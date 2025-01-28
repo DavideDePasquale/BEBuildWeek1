@@ -4,6 +4,8 @@ import org.example.DAO.*;
 import org.example.Main;
 import org.example.entities.*;
 import org.example.enumeration.Subscription;
+import org.example.enumeration.VehicleStatus;
+import org.example.enumeration.VehicleType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,6 +94,16 @@ public class Services {
             log.error("Non è possibile visualizzare i distributori", e);
         }
     }
+    public void displayActiveDistributors(boolean isActive){
+        try {
+           Query query = em.createQuery("SELECT d FROM Distributor d WHERE d.isActive = :isActive", Distributor.class);
+         List <Distributor> listActive =  query.setParameter("isActive", isActive).getResultList();
+         listActive.forEach(System.out::println);
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
     public void displayUsers(){
         try {
             List<User> users = em.createQuery("FROM User", User.class).getResultList();
@@ -106,6 +118,25 @@ public class Services {
             routes.forEach(System.out::println);
         } catch (Exception e) {
             log.error("Non è possibile visualizzare le tratte", e);
+        }
+    }
+    public List<Route> displayRoutesActiveVehicles(VehicleStatus status){
+        try {
+            Query query = em.createQuery("SELECT r FROM Route r JOIN r.vehicle v WHERE v.status = :status", Route.class).setParameter("status",status);
+            List<Route> listRouteActive = query.getResultList();
+          return  listRouteActive;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+    public void displayActiveVehicles(VehicleStatus status){
+        try {
+            List<Vehicle> vehiclesActive = em.createQuery("SELECT v FROM Vehicle v WHERE v.status = :status", Vehicle.class).setParameter("status",status).getResultList();
+            vehiclesActive.forEach(System.out::println);
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
     public void displayTickets(){
@@ -129,32 +160,37 @@ public class Services {
         }
          try {
              em.getTransaction().begin();
-             User user = em.find(User.class,userid);
-             Distributor distributor = em.find(Distributor.class,distributor_id);
-            if(user == null){
+             User user = em.find(User.class, userid);
+             Distributor distributor = em.find(Distributor.class, distributor_id);
+             if (user == null) {
                  log.error("ID not found");
                  em.getTransaction().rollback();
                  return;
              }
-             if(distributor == null){
+             if (distributor == null) {
                  log.error("ID not found");
                  em.getTransaction().rollback();
                  return;
              }
 
-             displayRoutes(em);
-             System.out.println("Please, enter Route id : ");
-             int option = Integer.parseInt(sc.nextLine());
-             Route route = routeDao.getFinById(option);
-             Ticket ticket = new Ticket(code,issueDate,expireDate,subscription,user,route);
-             ticket.setDistributor(distributor);
-             em.persist(ticket);
-             log.info("CONGRATULATIONS, YOU BOUGHT TICKET!! ❤️");
-             em.getTransaction().commit();
-         } catch (Exception e) {
-             throw new RuntimeException(e);
+
+             List<Route> listRoute = displayRoutesActiveVehicles(VehicleStatus.ACTIVE);
+             if (listRoute != null) {
+                 System.out.println("Please, enter Route id : ");
+                 int option = Integer.parseInt(sc.nextLine());
+                 Route route = routeDao.getFinById(option);
+                 Ticket ticket = new Ticket(code, issueDate, expireDate, subscription, user, route);
+                 ticket.setDistributor(distributor);
+                 em.persist(ticket);
+                 log.info("CONGRATULATIONS, YOU BOUGHT TICKET!! ❤️");
+                 em.getTransaction().commit();
+             } else {
+                 log.info("THERE IS NO ROUTE!");
+             }
+         }   catch(Exception e){
+                 throw new RuntimeException(e);
+             }
          }
-    }
     public static boolean isCodeExist(EntityManager em, String code){
             Query q = em.createQuery("SELECT t FROM Ticket t WHERE t.code = :code", Ticket.class);
             q.setParameter("code",code);

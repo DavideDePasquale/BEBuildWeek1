@@ -98,7 +98,6 @@ public class User {
                 ", password='" + password + '\'' +
                 ", cardNumber='" + cardNumber + '\'' +
                 ", isAdmin=" + isAdmin +
-                ", tickets=" + tickets +
                 '}';
     }
 }

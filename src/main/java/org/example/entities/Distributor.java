@@ -87,7 +87,6 @@ public class Distributor {
                 ", name='" + name + '\'' +
                 ", location='" + location + '\'' +
                 ", isActive=" + isActive +
-                ", tickets=" + tickets +
                 '}';
     }
 }

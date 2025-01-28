@@ -117,7 +117,8 @@ public class Main {
         Route route = routeDao.getFinById(option);
         services.displayDistributors();
         System.out.println("Please, enter Distributor id : ");
-        int dis_id = Integer.parseInt(sc.nextLine());
+        long dis_id = sc.nextLong();
+        sc.nextLine();
         Distributor distributor = em.find(Distributor.class,dis_id);
         services.addTicket(new Ticket(code,issueDate,expireDate,user,distributor,route));
     }
@@ -398,6 +399,7 @@ public class Main {
         System.out.println("Welcome User " + loggedinUser.getName());
         System.out.print("Enter Subscription type ( DAILY, MONTHLY or ANNUAL ) : ");
         Subscription subscription = Subscription.valueOf(sc.nextLine().toUpperCase());
+        services.displayActiveDistributors(true);
         System.out.print("Enter Distributor id : ");
         long distributorId = sc.nextLong();
         sc.nextLine();

@@ -123,7 +123,7 @@ public class Ticket {
                 ", issueDate=" + issueDate +
                 ", expireDate=" + expireDate +
                 ", subscription=" + subscription +
-                ", user=" + user +
+                ", userId=" + (user != null ? user.getId() : "null") +
                 ", distributor=" + distributor +
                 ", route=" + route +
                 '}';
