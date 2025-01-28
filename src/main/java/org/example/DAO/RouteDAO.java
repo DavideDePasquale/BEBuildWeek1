@@ -16,7 +16,12 @@ public class RouteDAO {
         em.getTransaction().commit();
     }
     public Route getFinById(long id){
-        return em.find(Route.class,id);
+        try {
+            return em.find(Route.class,id);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
     }
     public void delete(Route route){
         em.getTransaction().begin();

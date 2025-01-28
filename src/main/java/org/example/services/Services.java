@@ -172,18 +172,21 @@ public class Services {
                  em.getTransaction().rollback();
                  return;
              }
-
-
              List<Route> listRoute = displayRoutesActiveVehicles(VehicleStatus.ACTIVE);
+             listRoute.forEach(System.out::println);
              if (listRoute != null) {
                  System.out.println("Please, enter Route id : ");
                  int option = Integer.parseInt(sc.nextLine());
                  Route route = routeDao.getFinById(option);
-                 Ticket ticket = new Ticket(code, issueDate, expireDate, subscription, user, route);
-                 ticket.setDistributor(distributor);
-                 em.persist(ticket);
-                 log.info("CONGRATULATIONS, YOU BOUGHT TICKET!! ❤️");
-                 em.getTransaction().commit();
+                 if(route != null){
+                     Ticket ticket = new Ticket(code, issueDate, expireDate, subscription, user, route);
+                     ticket.setDistributor(distributor);
+                     em.persist(ticket);
+                     log.info("CONGRATULATIONS, YOU BOUGHT TICKET!! ❤️");
+                     em.getTransaction().commit();
+                 } else {
+                     log.error("ROUTE NOT FOUND!❌");
+                 }
              } else {
                  log.info("THERE IS NO ROUTE!");
              }

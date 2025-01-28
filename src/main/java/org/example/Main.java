@@ -393,8 +393,6 @@ public class Main {
 
     }
 
-
-
     public static void buyTicket(Scanner sc, User loggedinUser, Services services){
         System.out.println("Welcome User " + loggedinUser.getName());
         System.out.print("Enter Subscription type ( DAILY, MONTHLY or ANNUAL ) : ");
@@ -421,4 +419,5 @@ public class Main {
             throw new RuntimeException(e);
         }
     }
+
 }
