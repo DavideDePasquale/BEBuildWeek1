@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Scanner;
 
 import static org.example.services.Services.codeGenerator;
+import static org.example.services.Services.displayRoutesActiveVehicles;
 
 
 public class Main {
@@ -377,7 +378,7 @@ public class Main {
                 """);
                 int option = Integer.parseInt(sc.nextLine());
                 if ( option == 1 ){
-                    buyTicket(sc,loggedinUser,services);
+                    buyTicket(sc,loggedinUser,services,em);
                 } else if ( option == 2 ){
                     displayUserTickets(em,loggedinUser);
                 } else if ( option == 0 ){
@@ -393,16 +394,36 @@ public class Main {
 
     }
 
-    public static void buyTicket(Scanner sc, User loggedinUser, Services services){
+    public static void buyTicket(Scanner sc, User loggedinUser, Services services,EntityManager em){
         System.out.println("Welcome User " + loggedinUser.getName());
         System.out.print("Enter Subscription type ( DAILY, MONTHLY or ANNUAL ) : ");
         Subscription subscription = Subscription.valueOf(sc.nextLine().toUpperCase());
+        System.out.print("STARTPOINT : ");
+        String startPoint = sc.nextLine();
+        System.out.print("ENDPOINT : ");
+        String endPoint = sc.nextLine();
+
+
+        System.out.print("What do you want? BUS or TRAM?");
+        String resp = sc.nextLine();
+        List<Route> listRoute = null;
+        if(resp.equals("BUS")){
+            System.out.println(displayRoutesActiveVehicles(VehicleStatus.ACTIVE,VehicleType.BUS,em,startPoint,endPoint));
+
+        } else if (resp.equals("TRAM")) {
+            System.out.println(displayRoutesActiveVehicles(VehicleStatus.ACTIVE,VehicleType.TRAM,em,startPoint,endPoint));
+        }
+
+        System.out.println("-------------------------------------------------------------------------------");
         services.displayActiveDistributors(true);
+
         System.out.print("Enter Distributor id : ");
         long distributorId = sc.nextLong();
+        System.out.println("-------------------------------------------------------------------------------");
         sc.nextLine();
         long id = loggedinUser.getId();
-        services.buyTicket(id, subscription, distributorId,sc);
+
+        services.buyTicket(id, subscription, distributorId,sc,listRoute);
     }
     public static void displayUserTickets(EntityManager em, User loggedinUser){
         try {

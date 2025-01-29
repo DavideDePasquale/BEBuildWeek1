@@ -132,14 +132,14 @@ public class Services {
         }
     }
 
-    public List<Route> displayRoutesActiveVehicles(VehicleStatus status, VehicleType vehicle) {
+    public static List<Route> displayRoutesActiveVehicles(VehicleStatus status, VehicleType vehicle, EntityManager em,String startPoint, String endPoint) {
         List<Route> listRouteActive = null;
         try {
             if (vehicle == VehicleType.BUS) {
-                Query query = em.createQuery("SELECT r FROM Route r JOIN r.vehicle v WHERE v.status = :status AND v.type = :type", Route.class).setParameter("status", status).setParameter("type", VehicleType.BUS);
+                Query query = em.createQuery("SELECT v FROM Vehicle v JOIN v.routes r WHERE r.startPoint = :startPoint AND r.endPoint = :endPoint AND v.status = :status AND v.type = :type", Vehicle.class).setParameter("startPoint", startPoint).setParameter("endPoint", endPoint).setParameter("status", VehicleStatus.ACTIVE).setParameter("type", VehicleType.BUS);
                 listRouteActive = query.getResultList();
             } else if (vehicle == VehicleType.TRAM) {
-                Query query = em.createQuery("SELECT r FROM Route r JOIN r.vehicle v WHERE v.status = :status AND v.type = :type", Route.class).setParameter("status", status).setParameter("type", VehicleType.TRAM);
+                Query query = em.createQuery("SELECT v FROM Vehicle v JOIN v.routes r WHERE r.startPoint = :startPoint AND r.endPoint = :endPoint AND v.status = :status AND v.type = :type", Vehicle.class).setParameter("startPoint", startPoint).setParameter("endPoint", endPoint).setParameter("status", VehicleStatus.ACTIVE).setParameter("type", VehicleType.TRAM);
                 listRouteActive = query.getResultList();
             }
         } catch (Exception e) {
@@ -165,7 +165,7 @@ public class Services {
             log.error("Non è possibile visualizzare i tickets", e);
         }
     }
-    public void buyTicket(long userid, Subscription subscription, long distributor_id, Scanner sc){
+    public void buyTicket(long userid, Subscription subscription, long distributor_id, Scanner sc, List<Route> listRoute){
         String code = codeGenerator(em);
         LocalDateTime issueDate = LocalDateTime.now();
         LocalDateTime expireDate;
@@ -190,21 +190,11 @@ public class Services {
                  em.getTransaction().rollback();
                  return;
              }
-             System.out.print("What do you want? BUS or TRAM?");
-             String resp = sc.nextLine();
-             List<Route> listRoute = null;
-             if(resp.equals("BUS")){
 
-                 listRoute = displayRoutesActiveVehicles(VehicleStatus.ACTIVE,VehicleType.BUS);
-                 listRoute.forEach(System.out::println);
-
-             } else if (resp.equals("TRAM")) {
-                 listRoute = displayRoutesActiveVehicles(VehicleStatus.ACTIVE,VehicleType.TRAM);
-                 listRoute.forEach(System.out::println);
-
-             }
              if (listRoute != null) {
-                 System.out.println("Please, enter Route id : ");
+                 System.out.println("--------------------------------------------------------------------------");
+                 listRoute.forEach(System.out::println);
+                 System.out.print("Please, enter Route id : ");
                  int option = Integer.parseInt(sc.nextLine());
                  Route route = routeDao.getFinById(option);
                  if(route != null){
