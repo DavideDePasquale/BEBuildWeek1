@@ -24,6 +24,10 @@ import static org.example.services.Services.*;
 public class Main {
     private static final Logger log = LoggerFactory.getLogger(Main.class);
     private static Services services;
+       private static final EntityManagerFactory emf = Persistence.createEntityManagerFactory("BEBuildWeek1");
+       private static final  EntityManager em = emf.createEntityManager();
+       private static final   User loggedinUser = login(em);
+       private static final   Scanner sc = new Scanner(System.in);
 
 
     public static void main(String[] args) {
@@ -201,22 +205,33 @@ public class Main {
         Trip trip = new Trip(vehicle,route,startTime,endTime);
         services.addTrip(trip);
     }
-    public static void purchaseTicketMenu(EntityManager em, Scanner sc, User loggedinUser){
-        System.out.println("AOAOAOAOAOAOAOAO SONO QUIIIII CIAOOOO");
+    public static void purchaseTicketMenu(EntityManager em, Scanner sc, User loggedinUser, Services services){
         services.displayTrips(em);
         System.out.print("SELECT TRIP ID : ");
         int trip_id = Integer.parseInt(sc.nextLine());
         TripDAO tripDAO = new TripDAO(em);
         Trip trip = tripDAO.getFinById(trip_id);
+
+        if (trip == null) {
+            System.out.println("Trip not found!");
+            return;
+        }
+
         services.displayDistributors();
         System.out.print("SELECT DISTRIBUTOR ID : ");
         int distributor_id = Integer.parseInt(sc.nextLine());
         DistributorDAO distributorDAO = new DistributorDAO(em);
         Distributor distributor = distributorDAO.getFinById(distributor_id);
+
+        if (distributor == null) {
+            System.out.println("Distributor not found!");
+            return;
+        }
+
         System.out.println(loggedinUser + " " + trip + " " + distributor);
-        services.purchaseTicket(loggedinUser,trip ,distributor,em);
-        System.out.println("SONO QUI ECCEPCION EHEHEH OOOOOOO");
+        services.purchaseTicket(loggedinUser, trip, distributor, em);
     }
+
 
     private static User login(EntityManager em) {
         Scanner sc = new Scanner(System.in);
@@ -438,7 +453,7 @@ public class Main {
                     if(opt == 1 ){
                         buyTicket(sc,loggedinUser,services,em);
                     } else if(opt == 2){
-                        purchaseTicketMenu(em,sc,loggedinUser);
+                        purchaseTicketMenu(em,sc,loggedinUser,services);
                     }
                 } else if ( option == 2 ){
                     displayUserTickets(em,loggedinUser);

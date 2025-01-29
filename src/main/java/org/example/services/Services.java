@@ -289,17 +289,24 @@ public class Services {
         em.remove(trip);
         em.getTransaction().commit();
     }
-    public static void purchaseTicket(User user, Trip trip, Distributor distributor,EntityManager em){
-        System.out.println("ECCEPCION ZIDANE 1-1");
-        if(trip.getVehicle().getCapacity() <= trip.getTickets().size()){
-           log.error("TICKET SOLDOUT!");
+    public static void purchaseTicket(User user, Trip trip, Distributor distributor, EntityManager em){
+        if (trip.getVehicle() == null) {
+            log.error("Trip vehicle not found!");
+            return;
+        }
+
+        if (trip.getVehicle().getCapacity() <= trip.getTickets().size()){
+            log.error("TICKET SOLDOUT!");
         } else {
             String ticketCode = "IT" + codeGenerator(em);
             LocalDateTime issueDate = LocalDateTime.now();
             LocalDateTime expireDate = issueDate.plusDays(7);
             Ticket ticket = new Ticket(ticketCode, issueDate, expireDate, user, distributor, trip);
+            em.getTransaction().begin();
             em.persist(ticket);
-            System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+            em.getTransaction().commit();
+            System.out.println("Ticket purchased successfully!");
         }
     }
+
 }
