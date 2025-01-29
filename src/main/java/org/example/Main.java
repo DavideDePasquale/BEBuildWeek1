@@ -2,9 +2,7 @@ package org.example;
 
 
 import antlr.CodeGenerator;
-import org.example.DAO.DistributorDAO;
-import org.example.DAO.RouteDAO;
-import org.example.DAO.UserDAO;
+import org.example.DAO.*;
 import org.example.entities.*;
 import org.example.enumeration.DistributorType;
 import org.example.enumeration.Subscription;
@@ -15,12 +13,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.persistence.*;
+import java.sql.SQLOutput;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Scanner;
 
-import static org.example.services.Services.codeGenerator;
-import static org.example.services.Services.displayRoutesActiveVehicles;
+import static org.example.services.Services.*;
 
 
 public class Main {
@@ -93,6 +91,13 @@ public class Main {
         services.deleteUser(em, id);
         System.out.println("User is deleted!");
 
+    }
+    private static void deleteTrip(Scanner sc,Services services,EntityManager em){
+        services.displayTrips(em);
+        System.out.print("Please Select Trip id : ");
+        int trip_id = Integer.parseInt(sc.nextLine());
+        services.deleteTrip(em,trip_id);
+        System.out.println("Trip is deleted!");
     }
 
     private static void addTicket(Scanner sc, EntityManager em, Services services) {
@@ -167,7 +172,7 @@ public class Main {
     }
 
     private static void addVehicle(Scanner sc, Services services) {
-        System.out.print("Please enter Vehicle type (BUS or TRAM) : ");
+        System.out.print("Please enter Vehicle type (BUS, TRAM or TRAIN) : ");
         VehicleType type = VehicleType.valueOf(sc.nextLine().toUpperCase());
         System.out.print("Enter capacity : ");
         int capacity = sc.nextInt();
@@ -176,6 +181,41 @@ public class Main {
         VehicleStatus status = VehicleStatus.valueOf(sc.nextLine().toUpperCase());
         services.addVehicle(new Vehicle(type, capacity, status));
         return;
+    }
+    private static void addTrip(Scanner sc,Services services, EntityManager em){
+        displayVehicles(em);
+        System.out.println("Please, Select Vehicle id : ");
+        int vehicleType = sc.nextInt();
+        sc.nextLine();
+        VehicleDAO vehicleDAO = new VehicleDAO(em);
+        Vehicle vehicle = vehicleDAO.getFinById(vehicleType);
+        services.displayRoutes(em);
+        System.out.print("Please, Select Route id : ");
+        int route_id = Integer.parseInt(sc.nextLine());
+        RouteDAO routeDAO = new RouteDAO(em);
+        Route route = routeDAO.getFinById(route_id);
+        System.out.print("Please, select Start Time : ");
+        LocalDateTime startTime = LocalDateTime.parse(sc.nextLine());
+        System.out.print("Please, select End Time : ");
+        LocalDateTime endTime = LocalDateTime.parse(sc.nextLine());
+        Trip trip = new Trip(vehicle,route,startTime,endTime);
+        services.addTrip(trip);
+    }
+    public static void purchaseTicketMenu(EntityManager em, Scanner sc, User loggedinUser){
+        System.out.println("AOAOAOAOAOAOAOAO SONO QUIIIII CIAOOOO");
+        services.displayTrips(em);
+        System.out.print("SELECT TRIP ID : ");
+        int trip_id = Integer.parseInt(sc.nextLine());
+        TripDAO tripDAO = new TripDAO(em);
+        Trip trip = tripDAO.getFinById(trip_id);
+        services.displayDistributors();
+        System.out.print("SELECT DISTRIBUTOR ID : ");
+        int distributor_id = Integer.parseInt(sc.nextLine());
+        DistributorDAO distributorDAO = new DistributorDAO(em);
+        Distributor distributor = distributorDAO.getFinById(distributor_id);
+        System.out.println(loggedinUser + " " + trip + " " + distributor);
+        services.purchaseTicket(loggedinUser,trip ,distributor,em);
+        System.out.println("SONO QUI ECCEPCION EHEHEH OOOOOOO");
     }
 
     private static User login(EntityManager em) {
@@ -210,6 +250,7 @@ public class Main {
                         3 - Add Route
                         4 - Add User
                         5 - Add Ticket
+                        6 - Add Trip
                         0 - Back
                         """);
                 int option = Integer.parseInt(sc.nextLine());
@@ -234,6 +275,9 @@ public class Main {
                         addTicket(sc, em, services);
                         break;
                     }
+                    case 6: {
+                        addTrip(sc,services,em);
+                    }
                     case 0: {
                         back = false;
                         break;
@@ -257,6 +301,7 @@ public class Main {
                         3 - Delete Ticket
                         4 - Delete Route
                         5 - Delete Vehicle 
+                        6 - Delete Trip
                         0 - Back
                         """);
                 int option = Integer.parseInt(sc.nextLine());
@@ -279,6 +324,9 @@ public class Main {
                     }
                     case 5: {
                         deleteVehicle(sc, services, em);
+                    }
+                    case 6: {
+                        deleteTrip(sc,services,em);
                     }
                     case 0: {
                         back = false;
@@ -303,12 +351,13 @@ public class Main {
                         3 - Display Routes
                         4 - Display Users
                         5 - Display Tickets   
+                        6 - Display Trip
                         0 - Back
                         """);
                 int options = Integer.parseInt(sc.nextLine());
                 switch (options) {
                     case 1: {
-                        services.displayVehicles();
+                        services.displayVehicles(em);
                         break;
                     }
                     case 2: {
@@ -326,6 +375,9 @@ public class Main {
                     case 5: {
                         services.displayTickets();
                         break;
+                    }
+                    case 6: {
+                        services.displayTrips(em);
                     }
                     case 0: {
                         back = false;
@@ -378,7 +430,16 @@ public class Main {
                 """);
                 int option = Integer.parseInt(sc.nextLine());
                 if ( option == 1 ){
-                    buyTicket(sc,loggedinUser,services,em);
+                    System.out.println("""
+                            1 - PUBLIC TRANSPORTATION
+                            2 - INTERCITY TRANSPORTATION
+                            """);
+                    int opt = Integer.parseInt(sc.nextLine());
+                    if(opt == 1 ){
+                        buyTicket(sc,loggedinUser,services,em);
+                    } else if(opt == 2){
+                        purchaseTicketMenu(em,sc,loggedinUser);
+                    }
                 } else if ( option == 2 ){
                     displayUserTickets(em,loggedinUser);
                 } else if ( option == 0 ){
@@ -402,27 +463,23 @@ public class Main {
         String startPoint = sc.nextLine();
         System.out.print("ENDPOINT : ");
         String endPoint = sc.nextLine();
-
-
         System.out.print("What do you want? BUS or TRAM?");
         String resp = sc.nextLine();
         List<Route> listRoute = null;
         if(resp.equals("BUS")){
-            System.out.println(displayRoutesActiveVehicles(VehicleStatus.ACTIVE,VehicleType.BUS,em,startPoint,endPoint));
+            listRoute = displayRoutesActiveVehicles(VehicleStatus.ACTIVE,VehicleType.BUS,em,startPoint,endPoint);
 
         } else if (resp.equals("TRAM")) {
-            System.out.println(displayRoutesActiveVehicles(VehicleStatus.ACTIVE,VehicleType.TRAM,em,startPoint,endPoint));
-        }
 
+            listRoute = displayRoutesActiveVehicles(VehicleStatus.ACTIVE,VehicleType.TRAM,em,startPoint,endPoint);
+        }
         System.out.println("-------------------------------------------------------------------------------");
         services.displayActiveDistributors(true);
-
         System.out.print("Enter Distributor id : ");
         long distributorId = sc.nextLong();
         System.out.println("-------------------------------------------------------------------------------");
         sc.nextLine();
         long id = loggedinUser.getId();
-
         services.buyTicket(id, subscription, distributorId,sc,listRoute);
     }
     public static void displayUserTickets(EntityManager em, User loggedinUser){
@@ -440,5 +497,4 @@ public class Main {
             throw new RuntimeException(e);
         }
     }
-
 }

@@ -28,6 +28,9 @@ public class Ticket {
     @ManyToOne
     @JoinColumn(name = "route_id")
     private Route route;
+    @ManyToOne
+    @JoinColumn(name = "trip_id")
+    private Trip trip;
 
     public Ticket() {
     }
@@ -49,6 +52,15 @@ public class Ticket {
         this.user = user;
         this.distributor = distributor;
         this.route = route;
+    }
+
+    public Ticket(String code, LocalDateTime issueDate, LocalDateTime expireDate, User user, Distributor distributor, Trip trip) {
+        this.code = code;
+        this.issueDate = issueDate;
+        this.expireDate = expireDate;
+        this.user = user;
+        this.distributor = distributor;
+        this.trip = trip;
     }
 
     public Distributor getDistributor() {

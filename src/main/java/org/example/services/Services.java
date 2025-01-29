@@ -27,6 +27,7 @@ public class Services {
     private RouteDAO routeDao;
     private TicketDAO ticketDao;
     private UserDAO userDao;
+    private TripDAO tripDao;
 
     public Services() {
     }
@@ -38,6 +39,7 @@ public class Services {
         this.routeDao = new RouteDAO(em);
         this.ticketDao = new TicketDAO(em);
         this.userDao = new UserDAO(em);
+        this.tripDao = new TripDAO(em);
     }
 
     public void addVehicle(Vehicle vehicle) {
@@ -84,8 +86,16 @@ public class Services {
             log.error("Non è stato possibile aggiungere il ticket. Controlla l'errore -> ", e);
         }
     }
+    public void addTrip(Trip trip){
+        try {
+            tripDao.save(trip);
+            log.info("Hai aggiunto un nuovo viaggio");
+        } catch (Exception e) {
+           log.error("Non è stato possibile aggiungere il viaggio. Controlla l'errore -> ", e);
+        }
+    }
 
-    public void displayVehicles() {
+    public static void displayVehicles(EntityManager em) {
         try {
             List<Vehicle> vehicles = em.createQuery("FROM Vehicle", Vehicle.class).getResultList();
             vehicles.forEach(System.out::println);
@@ -131,15 +141,23 @@ public class Services {
             log.error("Non è possibile visualizzare le tratte", e);
         }
     }
+    public void displayTrips(EntityManager em){
+        try {
+            List<Trip> trips = em.createQuery("FROM Trip", Trip.class).getResultList();
+            trips.forEach(System.out::println);
+        } catch (Exception e) {
+            log.error("Non è possibile visualizzare i viaggi ", e);
+        }
+    }
 
     public static List<Route> displayRoutesActiveVehicles(VehicleStatus status, VehicleType vehicle, EntityManager em,String startPoint, String endPoint) {
         List<Route> listRouteActive = null;
         try {
             if (vehicle == VehicleType.BUS) {
-                Query query = em.createQuery("SELECT v FROM Vehicle v JOIN v.routes r WHERE r.startPoint = :startPoint AND r.endPoint = :endPoint AND v.status = :status AND v.type = :type", Vehicle.class).setParameter("startPoint", startPoint).setParameter("endPoint", endPoint).setParameter("status", VehicleStatus.ACTIVE).setParameter("type", VehicleType.BUS);
+                Query query = em.createQuery("SELECT r FROM Route r JOIN r.vehicle v WHERE r.startPoint = :startPoint AND r.endPoint = :endPoint AND v.status = :status  AND v.type = :type", Route.class).setParameter("startPoint", startPoint).setParameter("endPoint", endPoint).setParameter("status", VehicleStatus.ACTIVE).setParameter("type", VehicleType.BUS);
                 listRouteActive = query.getResultList();
             } else if (vehicle == VehicleType.TRAM) {
-                Query query = em.createQuery("SELECT v FROM Vehicle v JOIN v.routes r WHERE r.startPoint = :startPoint AND r.endPoint = :endPoint AND v.status = :status AND v.type = :type", Vehicle.class).setParameter("startPoint", startPoint).setParameter("endPoint", endPoint).setParameter("status", VehicleStatus.ACTIVE).setParameter("type", VehicleType.TRAM);
+                Query query = em.createQuery("SELECT r FROM Route r JOIN r.vehicle v WHERE r.startPoint = :startPoint AND r.endPoint = :endPoint AND v.status = :status  AND v.type = :type", Route.class).setParameter("startPoint", startPoint).setParameter("endPoint", endPoint).setParameter("status", VehicleStatus.ACTIVE).setParameter("type", VehicleType.TRAM);
                 listRouteActive = query.getResultList();
             }
         } catch (Exception e) {
@@ -190,7 +208,6 @@ public class Services {
                  em.getTransaction().rollback();
                  return;
              }
-
              if (listRoute != null) {
                  System.out.println("--------------------------------------------------------------------------");
                  listRoute.forEach(System.out::println);
@@ -264,5 +281,25 @@ public class Services {
         distributor = em.find(Distributor.class,id);
         em.remove(distributor);
         em.getTransaction().commit();
+    }
+    public static void deleteTrip(EntityManager em, long id){
+        Trip trip = new Trip();
+        em.getTransaction().begin();
+        trip = em.find(Trip.class,id);
+        em.remove(trip);
+        em.getTransaction().commit();
+    }
+    public static void purchaseTicket(User user, Trip trip, Distributor distributor,EntityManager em){
+        System.out.println("ECCEPCION ZIDANE 1-1");
+        if(trip.getVehicle().getCapacity() <= trip.getTickets().size()){
+           log.error("TICKET SOLDOUT!");
+        } else {
+            String ticketCode = "IT" + codeGenerator(em);
+            LocalDateTime issueDate = LocalDateTime.now();
+            LocalDateTime expireDate = issueDate.plusDays(7);
+            Ticket ticket = new Ticket(ticketCode, issueDate, expireDate, user, distributor, trip);
+            em.persist(ticket);
+            System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+        }
     }
 }
