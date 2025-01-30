@@ -2,11 +2,13 @@ package org.example.services;
 
 import org.example.DAO.*;
 import org.example.entities.Ticket;
+import org.example.entities.Trip;
 import org.example.entities.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.persistence.EntityManager;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class Reports {
@@ -37,5 +39,21 @@ public class Reports {
         throw new RuntimeException(e);
      }
     }
+    public static void searchTicketByTripId(Trip trip, EntityManager em){
+        try {
+            List<Ticket> tickets = em.createQuery("SELECT t FROM Ticket t WHERE t.trip = :trip", Ticket.class).setParameter("trip",trip).getResultList();
+            tickets.forEach(System.out::println);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public static void searchTicketByDate(String localDateTime , EntityManager em){
+        try {
+            List<Ticket> tickets = em.createQuery("SELECT t FROM Ticket t WHERE t.issueDate LIKE :issueDate", Ticket.class).setParameter("issueDate", "%2025%").getResultList();
+            tickets.forEach(System.out::println);
 
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

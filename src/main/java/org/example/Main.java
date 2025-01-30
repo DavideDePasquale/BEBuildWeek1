@@ -22,6 +22,7 @@ import static org.example.services.Services.*;
 
 
 public class Main {
+
        private static final Logger log = LoggerFactory.getLogger(Main.class);
 
        private static final EntityManagerFactory emf = Persistence.createEntityManagerFactory("BEBuildWeek1");
@@ -485,6 +486,20 @@ public class Main {
                 UserDAO userDAO = new UserDAO(em);
                 User user = userDAO.getFinById(user_id);
                 Reports.searchTicketsById(user,em);
+                break;
+            } else if (option == 2) {
+                services.displayTrips(em);
+                System.out.print("INSERT TRIP ID : ");
+                long trip_id = Long.parseLong(sc.nextLine());
+                TripDAO tripDAO = new TripDAO(em);
+                Trip trip = tripDAO.getFinById(trip_id);
+                Reports.searchTicketByTripId(trip,em);
+                break;
+            } else if (option == 3) {
+                System.out.print("INSERT DATE : ");
+                String localDateTime = sc.nextLine();
+                Reports.searchTicketByDate(localDateTime,em);
+                break;
 
             } else if (option == 0) {
                 break;
