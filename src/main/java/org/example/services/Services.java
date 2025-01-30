@@ -104,7 +104,7 @@ public class Services {
         }
     }
 
-    public void displayDistributors() {
+    public static void displayDistributors(EntityManager em) {
         try {
             List<Distributor> distributors = em.createQuery("FROM Distributor", Distributor.class).getResultList();
             distributors.forEach(System.out::println);
@@ -308,5 +308,24 @@ public class Services {
             System.out.println("Ticket purchased successfully!");
         }
     }
-
+   public static List<User> saveUsers(EntityManager em){
+       List<User> users = em.createQuery("FROM User", User.class).getResultList();
+       return users;
+   }
+   public static List<Vehicle> saveVehicles(EntityManager em){
+        List<Vehicle> vehicles = em.createQuery("FROM Vehicle", Vehicle.class).getResultList();
+        return vehicles;
+   }
+    public static List<Route> saveRoutes(EntityManager em){
+        List<Route> routes = em.createQuery("FROM Route", Route.class).getResultList();
+        return routes;
+    }
+    public static List<Trip> saveTrips(EntityManager em){
+        List<Trip> trips = em.createQuery("FROM Trip", Trip.class).getResultList();
+        return trips;
+    }
+    public static List<Ticket> saveTickets(EntityManager em){
+        List<Ticket> tickets = em.createQuery("FROM Ticket", Ticket.class).getResultList();
+        return tickets;
+    }
 }

@@ -3,5 +3,7 @@ package org.example.enumeration;
 public enum VehicleType {
     BUS,
     TRAM,
-    TRAIN
+    TRAIN,
+    NATIONAL_BUS,
+    TRAIN_ITALO
 }

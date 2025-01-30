@@ -18,6 +18,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Scanner;
 
+import static org.example.services.FileExport.*;
+import static org.example.services.Reports.vehiclesInMaintenance;
 import static org.example.services.Services.*;
 
 
@@ -121,7 +123,7 @@ public class Main {
         System.out.println("Please, enter Route id : ");
         int option = Integer.parseInt(sc.nextLine());
         Route route = routeDao.getFinById(option);
-        services.displayDistributors();
+        services.displayDistributors(em);
         System.out.println("Please, enter Distributor id : ");
         long dis_id = sc.nextLong();
         sc.nextLine();
@@ -213,7 +215,7 @@ public class Main {
             return;
         }
 
-        services.displayDistributors();
+        services.displayDistributors(em);
         System.out.print("SELECT DISTRIBUTOR ID : ");
         int distributor_id = Integer.parseInt(sc.nextLine());
         DistributorDAO distributorDAO = new DistributorDAO(em);
@@ -372,7 +374,7 @@ public class Main {
                         break;
                     }
                     case 2: {
-                        services.displayDistributors();
+                        services.displayDistributors(em);
                         break;
                     }
                     case 3: {
@@ -407,11 +409,12 @@ public class Main {
     public static void adminMenu(Scanner sc, Services services,EntityManager em){
         while (true) {
             try {
-                System.out.print("""
+                System.out.println("""
                         1 ADD ITEMS
                         2 DELETE ITEMS
                         3 DISPLAY ITEMS
                         4 REPORTS
+                        5 SAVE TO FILE
                         0 EXIT
                         """);
                 int option = Integer.parseInt(sc.nextLine());
@@ -423,6 +426,8 @@ public class Main {
                     displayMenu(sc, services, em);
                 } else if (option == 4) {
                     reportsMenu(services);
+                } else if (option == 5) {
+                    saveToFileMenu();
                 } else if (option == 0) {
                     System.out.println("EXITING");
                     break;
@@ -466,7 +471,6 @@ public class Main {
                log.error("SELECT NUMBER BETWEEN 1 and 2 and for EXIT insert 0");
             }
         }
-
     }
     public static void reportsMenu(Services services){
         while (true) {
@@ -474,7 +478,8 @@ public class Main {
                     1 - SEARCH SOLED TICKET BY USER ID
                     2 - SEARCH SOLED TICKET BY TRIP
                     3 - SEARCH SOLED TICKET BY DATE
-                    4 - SEARCH SOLED TICKET BY VEHICLE
+                    4 - SEARCH SOLED TICKET IN SPECIFIC DISTRIBUTOR 
+                    5 - LIST OF VEHICLES IN MAINTENANCE 
                     0 - BACK
                     """);
             int option = sc.nextInt();
@@ -501,40 +506,48 @@ public class Main {
                 Reports.searchTicketByDate(localDateTime,em);
                 break;
 
+            } else if (option == 4) {
+                searchTicketByDistributorMenu();
+
+            } else if (option == 5) {
+                vehiclesInMaintenance();
             } else if (option == 0) {
                 break;
 
             }
         }
-
     }
+    public static void buyTicket(Scanner sc, User loggedinUser, Services services,EntityManager em) {
 
-    public static void buyTicket(Scanner sc, User loggedinUser, Services services,EntityManager em){
         System.out.println("Welcome User " + loggedinUser.getName());
-        System.out.print("Enter Subscription type ( DAILY, MONTHLY or ANNUAL ) : ");
-        Subscription subscription = Subscription.valueOf(sc.nextLine().toUpperCase());
-        System.out.print("STARTPOINT : ");
-        String startPoint = sc.nextLine();
-        System.out.print("ENDPOINT : ");
-        String endPoint = sc.nextLine();
-        System.out.print("What do you want? BUS or TRAM?");
-        String resp = sc.nextLine();
-        List<Route> listRoute = null;
-        if(resp.equals("BUS")){
-            listRoute = displayRoutesActiveVehicles(VehicleStatus.ACTIVE,VehicleType.BUS,em,startPoint,endPoint);
+        System.out.println(loggedinUser.getCardNumber());
+        if (loggedinUser.getCardNumber().equals("")) {
+            System.out.println("You Haven't any Card number!You buy only Intercity Ticket");
+        } else {
+            System.out.print("Enter Subscription type ( DAILY, MONTHLY or ANNUAL ) : ");
+            Subscription subscription = Subscription.valueOf(sc.nextLine().toUpperCase());
+            System.out.print("STARTPOINT : ");
+            String startPoint = sc.nextLine();
+            System.out.print("ENDPOINT : ");
+            String endPoint = sc.nextLine();
+            System.out.print("What do you want? BUS or TRAM?");
+            String resp = sc.nextLine();
+            List<Route> listRoute = null;
+            if (resp.equals("BUS")) {
+                listRoute = displayRoutesActiveVehicles(VehicleStatus.ACTIVE, VehicleType.BUS, em, startPoint, endPoint);
 
-        } else if (resp.equals("TRAM")) {
-
-            listRoute = displayRoutesActiveVehicles(VehicleStatus.ACTIVE,VehicleType.TRAM,em,startPoint,endPoint);
+            } else if (resp.equals("TRAM")) {
+                listRoute = displayRoutesActiveVehicles(VehicleStatus.ACTIVE, VehicleType.TRAM, em, startPoint, endPoint);
+            }
+            System.out.println("-------------------------------------------------------------------------------");
+            services.displayActiveDistributors(true);
+            System.out.print("Enter Distributor id : ");
+            long distributorId = sc.nextLong();
+            System.out.println("-------------------------------------------------------------------------------");
+            sc.nextLine();
+            long id = loggedinUser.getId();
+            services.buyTicket(id, subscription, distributorId, sc, listRoute);
         }
-        System.out.println("-------------------------------------------------------------------------------");
-        services.displayActiveDistributors(true);
-        System.out.print("Enter Distributor id : ");
-        long distributorId = sc.nextLong();
-        System.out.println("-------------------------------------------------------------------------------");
-        sc.nextLine();
-        long id = loggedinUser.getId();
-        services.buyTicket(id, subscription, distributorId,sc,listRoute);
     }
     public static void displayUserTickets(EntityManager em, User loggedinUser){
         try {
@@ -550,5 +563,46 @@ public class Main {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+    public static void saveToFileMenu(){
+        while (true){
+        System.out.println("""
+                1 - SAVE USERS TO FILE
+                2 - SAVE VEHICLES TO FILE
+                3 - SAVE ROUTES TO FILE
+                4 - SAVE TRIPS TO FILE
+                5 - SAVE TICKETS TO FILE   
+                0 - BACK
+                """);
+        int option = Integer.parseInt(sc.nextLine());
+        if(option == 1){
+            List<User> listUsers = Services.saveUsers(em);
+            writeListOfUsersToFile(listUsers,"./files/user/");
+        } else if (option == 2) {
+            List<Vehicle> vehicles= Services.saveVehicles(em);
+            writeListOfVehiclesToFile(vehicles, "./files/vehicle/");
+        } else if (option == 3) {
+            List<Route> listRoutes = Services.saveRoutes(em);
+            writeListOfRoutesToFile(listRoutes, "./files/routes/");
+        } else if (option == 4) {
+            List<Trip> listTrips = Services.saveTrips(em);
+            writeListOfTripsToFile(listTrips,"./files/trips/");
+        } else if (option == 5) {
+            List<Ticket> listTickets = Services.saveTickets(em);
+            writeListOfTicketToFile(listTickets,"./files/tickets/");
+        } else if (option == 0) {
+            break;
+          } else {
+            log.info("INVALID OPTION!");
+        }
+        }
+    }
+    public static void searchTicketByDistributorMenu(){
+        Services.displayDistributors(em);
+        System.out.print("PLEASE, INSERT DISTRIBUTOR ID : ");
+        long distributor_id = Long.parseLong(sc.nextLine());
+        DistributorDAO distributorDAO = new DistributorDAO(em);
+        Distributor distributor = distributorDAO.getFinById(distributor_id);
+        Reports.searchTicketByDistributor(distributor,em);
     }
 }

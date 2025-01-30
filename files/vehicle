@@ -1,0 +1,5 @@
+Vehicle{id=1, type=BUS, capacity=50, status=ACTIVE}
+Vehicle{id=3, type=TRAM, capacity=145, status=ACTIVE}
+Vehicle{id=2, type=BUS, capacity=50, status=MAINTENANCE}
+Vehicle{id=4, type=BUS, capacity=100, status=ACTIVE}
+Vehicle{id=5, type=TRAIN, capacity=500, status=ACTIVE}

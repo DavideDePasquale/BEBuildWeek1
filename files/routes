@@ -1,0 +1,5 @@
+Route{id=6, startPoint='Bari', endPoint='Roma', estimatedDuration=240, vehicle=Vehicle{id=2, type=BUS, capacity=50, status=MAINTENANCE}}
+Route{id=1, startPoint='Bari', endPoint='Roma', estimatedDuration=240, vehicle=Vehicle{id=3, type=TRAM, capacity=145, status=ACTIVE}}
+Route{id=2, startPoint='Bari', endPoint='Roma', estimatedDuration=240, vehicle=Vehicle{id=1, type=BUS, capacity=50, status=ACTIVE}}
+Route{id=7, startPoint='Bari', endPoint='Napoli', estimatedDuration=180, vehicle=Vehicle{id=2, type=BUS, capacity=50, status=MAINTENANCE}}
+Route{id=8, startPoint='Roma', endPoint='Milano', estimatedDuration=285, vehicle=Vehicle{id=3, type=TRAM, capacity=145, status=ACTIVE}}
