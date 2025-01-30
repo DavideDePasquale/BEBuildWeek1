@@ -47,13 +47,17 @@ public class Reports {
             throw new RuntimeException(e);
         }
     }
-    public static void searchTicketByDate(String localDateTime , EntityManager em){
+    public static void searchTicketByDate(String dateString, EntityManager em) {
         try {
-            List<Ticket> tickets = em.createQuery("SELECT t FROM Ticket t WHERE t.issueDate LIKE :issueDate", Ticket.class).setParameter("issueDate", "%2025%").getResultList();
-            tickets.forEach(System.out::println);
+            List<Ticket> tickets = em.createQuery(
+                            "SELECT t FROM Ticket t WHERE TO_CHAR(t.issueDate, 'YYYY-MM-DD') LIKE :issueDate", Ticket.class)
+                    .setParameter("issueDate", dateString + "%")
+                    .getResultList();
 
+            tickets.forEach(System.out::println);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
+
 }
