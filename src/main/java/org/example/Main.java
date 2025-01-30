@@ -366,7 +366,7 @@ public class Main {
                         3 - Display Routes
                         4 - Display Users
                         5 - Display Tickets   
-                        6 - Display Trip
+                        6 - Display Trips
                         0 - Back
                         """);
                 int options = Integer.parseInt(sc.nextLine());
