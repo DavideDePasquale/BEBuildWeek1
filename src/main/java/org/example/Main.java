@@ -8,12 +8,12 @@ import org.example.enumeration.DistributorType;
 import org.example.enumeration.Subscription;
 import org.example.enumeration.VehicleStatus;
 import org.example.enumeration.VehicleType;
+import org.example.services.Reports;
 import org.example.services.Services;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.persistence.*;
-import java.sql.SQLOutput;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Scanner;
@@ -22,22 +22,17 @@ import static org.example.services.Services.*;
 
 
 public class Main {
-    private static final Logger log = LoggerFactory.getLogger(Main.class);
-    private static Services services;
+       private static final Logger log = LoggerFactory.getLogger(Main.class);
+
        private static final EntityManagerFactory emf = Persistence.createEntityManagerFactory("BEBuildWeek1");
        private static final  EntityManager em = emf.createEntityManager();
        private static final   User loggedinUser = login(em);
        private static final   Scanner sc = new Scanner(System.in);
+       private static final Reports reports = new Reports();
 
 
     public static void main(String[] args) {
-
-        EntityManagerFactory emf = Persistence.createEntityManagerFactory("BEBuildWeek1");
-        EntityManager em = emf.createEntityManager();
-        User loggedinUser = login(em);
-        Scanner sc = new Scanner(System.in);
-        Services services = new Services(em);
-
+          Services services = new Services(em);
 
         if (loggedinUser != null) {
             System.out.println("Login Successfull!!!");
@@ -415,6 +410,7 @@ public class Main {
                         1 ADD ITEMS
                         2 DELETE ITEMS
                         3 DISPLAY ITEMS
+                        4 REPORTS
                         0 EXIT
                         """);
                 int option = Integer.parseInt(sc.nextLine());
@@ -424,6 +420,8 @@ public class Main {
                     deleteMenu(sc, services, em);
                 } else if (option == 3) {
                     displayMenu(sc, services, em);
+                } else if (option == 4) {
+                    reportsMenu(services);
                 } else if (option == 0) {
                     System.out.println("EXITING");
                     break;
@@ -465,6 +463,32 @@ public class Main {
                 }
             } catch (RuntimeException e) {
                log.error("SELECT NUMBER BETWEEN 1 and 2 and for EXIT insert 0");
+            }
+        }
+
+    }
+    public static void reportsMenu(Services services){
+        while (true) {
+            System.out.println("""
+                    1 - SEARCH SOLED TICKET BY USER ID
+                    2 - SEARCH SOLED TICKET BY TRIP
+                    3 - SEARCH SOLED TICKET BY DATE
+                    4 - SEARCH SOLED TICKET BY VEHICLE
+                    0 - BACK
+                    """);
+            int option = sc.nextInt();
+            sc.nextLine();
+            if (option == 1) {
+                services.displayUsers();
+                System.out.print("INSERT USER ID : ");
+                long user_id = Long.parseLong(sc.nextLine());
+                UserDAO userDAO = new UserDAO(em);
+                User user = userDAO.getFinById(user_id);
+                Reports.searchTicketsById(user,em);
+
+            } else if (option == 0) {
+                break;
+
             }
         }
 
