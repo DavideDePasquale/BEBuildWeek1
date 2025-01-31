@@ -25,25 +25,25 @@ import static org.example.services.Services.*;
 
 public class Main {
 
-       private static final Logger log = LoggerFactory.getLogger(Main.class);
+    private static final Logger log = LoggerFactory.getLogger(Main.class);
 
-       private static final EntityManagerFactory emf = Persistence.createEntityManagerFactory("BEBuildWeek1");
-       private static final  EntityManager em = emf.createEntityManager();
-       private static final   User loggedinUser = login(em);
-       private static final   Scanner sc = new Scanner(System.in);
-       private static final Reports reports = new Reports();
+    private static final EntityManagerFactory emf = Persistence.createEntityManagerFactory("BEBuildWeek1");
+    private static final EntityManager em = emf.createEntityManager();
+    private static final User loggedinUser = login(em);
+    private static final Scanner sc = new Scanner(System.in);
+    private static final Reports reports = new Reports();
 
 
     public static void main(String[] args) {
-          Services services = new Services(em);
+        Services services = new Services(em);
 
         if (loggedinUser != null) {
             System.out.println("Login Successfull!!!");
 
             if (loggedinUser.isAdmin()) {
-                adminMenu(sc,services,em);
-            }  else {
-             userMenu(sc,loggedinUser,services,em);
+                adminMenu(sc, services, em);
+            } else {
+                userMenu(sc, loggedinUser, services, em);
             }
         } else {
             System.out.print("Login failed");
@@ -94,11 +94,12 @@ public class Main {
         System.out.println("User is deleted!");
 
     }
-    private static void deleteTrip(Scanner sc,Services services,EntityManager em){
+
+    private static void deleteTrip(Scanner sc, Services services, EntityManager em) {
         services.displayTrips(em);
         System.out.print("Please Select Trip id : ");
         int trip_id = Integer.parseInt(sc.nextLine());
-        services.deleteTrip(em,trip_id);
+        services.deleteTrip(em, trip_id);
         System.out.println("Trip is deleted!");
     }
 
@@ -127,8 +128,8 @@ public class Main {
         System.out.println("Please, enter Distributor id : ");
         long dis_id = sc.nextLong();
         sc.nextLine();
-        Distributor distributor = em.find(Distributor.class,dis_id);
-        services.addTicket(new Ticket(code,issueDate,expireDate,user,distributor,route));
+        Distributor distributor = em.find(Distributor.class, dis_id);
+        services.addTicket(new Ticket(code, issueDate, expireDate, user, distributor, route));
     }
 
     private static void addUser(Scanner sc, Services services) {
@@ -184,7 +185,8 @@ public class Main {
         services.addVehicle(new Vehicle(type, capacity, status));
         return;
     }
-    private static void addTrip(Scanner sc,Services services, EntityManager em){
+
+    private static void addTrip(Scanner sc, Services services, EntityManager em) {
         displayVehicles(em);
         System.out.println("Please, Select Vehicle id : ");
         int vehicleType = sc.nextInt();
@@ -200,10 +202,11 @@ public class Main {
         LocalDateTime startTime = LocalDateTime.parse(sc.nextLine());
         System.out.print("Please, select End Time : ");
         LocalDateTime endTime = LocalDateTime.parse(sc.nextLine());
-        Trip trip = new Trip(vehicle,route,startTime,endTime);
+        Trip trip = new Trip(vehicle, route, startTime, endTime);
         services.addTrip(trip);
     }
-    public static void purchaseTicketMenu(EntityManager em, Scanner sc, User loggedinUser, Services services){
+
+    public static void purchaseTicketMenu(EntityManager em, Scanner sc, User loggedinUser, Services services) {
         services.displayTrips(em);
         System.out.print("SELECT TRIP ID : ");
         int trip_id = Integer.parseInt(sc.nextLine());
@@ -289,7 +292,7 @@ public class Main {
                         break;
                     }
                     case 6: {
-                        addTrip(sc,services,em);
+                        addTrip(sc, services, em);
                     }
                     case 0: {
                         back = false;
@@ -299,12 +302,13 @@ public class Main {
                         System.out.println("Invalid Options! Write again");
                     }
                 }
-            }   catch (Exception e) {
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }
     }
-    public static void deleteMenu(Scanner sc, Services services, EntityManager em){
+
+    public static void deleteMenu(Scanner sc, Services services, EntityManager em) {
         boolean back = true;
         while (back) {
             try {
@@ -339,7 +343,7 @@ public class Main {
                         deleteVehicle(sc, services, em);
                     }
                     case 6: {
-                        deleteTrip(sc,services,em);
+                        deleteTrip(sc, services, em);
                     }
                     case 0: {
                         back = false;
@@ -349,12 +353,13 @@ public class Main {
                         System.out.println("Invalid Options! Write again");
                     }
                 }
-            }   catch (Exception e) {
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }
     }
-    public static void displayMenu(Scanner sc, Services services, EntityManager em){
+
+    public static void displayMenu(Scanner sc, Services services, EntityManager em) {
         boolean back = true;
         while (back) {
             try {
@@ -400,13 +405,14 @@ public class Main {
                         System.out.println("Invalid Options! Write again");
                     }
                 }
-            }   catch (RuntimeException e) {
+            } catch (RuntimeException e) {
                 log.error("AOOOOOOOOOO" + e);
                 break;
             }
         }
     }
-    public static void adminMenu(Scanner sc, Services services,EntityManager em){
+
+    public static void adminMenu(Scanner sc, Services services, EntityManager em) {
         while (true) {
             try {
                 System.out.println("""
@@ -435,44 +441,50 @@ public class Main {
                     log.error("INVALID NUMBER! TRY AGAIN");
                 }
             } catch (RuntimeException e) {
-               log.error("INVALID OPTION!");
+                log.error("INVALID OPTION!");
             }
         }
     }
-    public static void userMenu(Scanner sc, User loggedinUser, Services services, EntityManager em){
-        while (true){
+
+    public static void userMenu(Scanner sc, User loggedinUser, Services services, EntityManager em) {
+        while (true) {
             try {
                 System.out.println("""
-                1 - BUY TICKET
-                2 - SHOW TICKETS
-                0 - EXIT
-                """);
+                        1 - BUY TICKET
+                        2 - SHOW TICKETS
+                        3 - CHANGE PASSWORD
+                        0 - EXIT
+                        """);
                 int option = Integer.parseInt(sc.nextLine());
-                if ( option == 1 ){
+                if (option == 1) {
                     System.out.println("""
                             1 - PUBLIC TRANSPORTATION
                             2 - INTERCITY TRANSPORTATION
                             """);
                     int opt = Integer.parseInt(sc.nextLine());
-                    if(opt == 1 ){
-                        buyTicket(sc,loggedinUser,services,em);
-                    } else if(opt == 2){
-                        purchaseTicketMenu(em,sc,loggedinUser,services);
+                    if (opt == 1) {
+                        buyTicket(sc, loggedinUser, services, em);
+                    } else if (opt == 2) {
+                        purchaseTicketMenu(em, sc, loggedinUser, services);
                     }
-                } else if ( option == 2 ){
-                    displayUserTickets(em,loggedinUser);
-                } else if ( option == 0 ){
+                } else if (option == 2) {
+                    displayUserTickets(em, loggedinUser);
+                } else if (option == 3) {
+                    newPasswordMenu(services,em);
+
+                } else if (option == 0) {
                     log.info("BYE BYE");
                     break;
                 } else {
                     log.error("INVALID OPTION!");
                 }
             } catch (RuntimeException e) {
-               log.error("SELECT NUMBER BETWEEN 1 and 2 and for EXIT insert 0");
+                log.error("SELECT NUMBER BETWEEN 1 and 2 and for EXIT insert 0");
             }
         }
     }
-    public static void reportsMenu(Services services){
+
+    public static void reportsMenu(Services services) {
         while (true) {
             System.out.println("""
                     1 - SEARCH SOLED TICKET BY USER ID
@@ -490,7 +502,7 @@ public class Main {
                 long user_id = Long.parseLong(sc.nextLine());
                 UserDAO userDAO = new UserDAO(em);
                 User user = userDAO.getFinById(user_id);
-                Reports.searchTicketsById(user,em);
+                Reports.searchTicketsById(user, em);
                 break;
             } else if (option == 2) {
                 services.displayTrips(em);
@@ -498,12 +510,12 @@ public class Main {
                 long trip_id = Long.parseLong(sc.nextLine());
                 TripDAO tripDAO = new TripDAO(em);
                 Trip trip = tripDAO.getFinById(trip_id);
-                Reports.searchTicketByTripId(trip,em);
+                Reports.searchTicketByTripId(trip, em);
                 break;
             } else if (option == 3) {
                 System.out.print("INSERT DATE : ");
                 String localDateTime = sc.nextLine();
-                Reports.searchTicketByDate(localDateTime,em);
+                Reports.searchTicketByDate(localDateTime, em);
                 break;
 
             } else if (option == 4) {
@@ -517,7 +529,8 @@ public class Main {
             }
         }
     }
-    public static void buyTicket(Scanner sc, User loggedinUser, Services services,EntityManager em) {
+
+    public static void buyTicket(Scanner sc, User loggedinUser, Services services, EntityManager em) {
 
         System.out.println("Welcome User " + loggedinUser.getName());
         System.out.println(loggedinUser.getCardNumber());
@@ -549,12 +562,13 @@ public class Main {
             services.buyTicket(id, subscription, distributorId, sc, listRoute);
         }
     }
-    public static void displayUserTickets(EntityManager em, User loggedinUser){
+
+    public static void displayUserTickets(EntityManager em, User loggedinUser) {
         try {
             Query q = em.createQuery("SELECT t FROM Ticket t WHERE t.user.id = :userId", Ticket.class);
-            q.setParameter("userId",loggedinUser.getId());
+            q.setParameter("userId", loggedinUser.getId());
             List<Ticket> listTickets = q.getResultList();
-            if(listTickets.isEmpty()) {
+            if (listTickets.isEmpty()) {
                 System.out.println("NO TICKET FOUND FOR THIS USER");
             } else {
                 System.out.println("TICKETS FOR USER : ");
@@ -564,45 +578,63 @@ public class Main {
             throw new RuntimeException(e);
         }
     }
-    public static void saveToFileMenu(){
-        while (true){
-        System.out.println("""
-                1 - SAVE USERS TO FILE
-                2 - SAVE VEHICLES TO FILE
-                3 - SAVE ROUTES TO FILE
-                4 - SAVE TRIPS TO FILE
-                5 - SAVE TICKETS TO FILE   
-                0 - BACK
-                """);
-        int option = Integer.parseInt(sc.nextLine());
-        if(option == 1){
-            List<User> listUsers = Services.saveUsers(em);
-            writeListOfUsersToFile(listUsers,"./files/user/");
-        } else if (option == 2) {
-            List<Vehicle> vehicles= Services.saveVehicles(em);
-            writeListOfVehiclesToFile(vehicles, "./files/vehicle/");
-        } else if (option == 3) {
-            List<Route> listRoutes = Services.saveRoutes(em);
-            writeListOfRoutesToFile(listRoutes, "./files/routes/");
-        } else if (option == 4) {
-            List<Trip> listTrips = Services.saveTrips(em);
-            writeListOfTripsToFile(listTrips,"./files/trips/");
-        } else if (option == 5) {
-            List<Ticket> listTickets = Services.saveTickets(em);
-            writeListOfTicketToFile(listTickets,"./files/tickets/");
-        } else if (option == 0) {
-            break;
-          } else {
-            log.info("INVALID OPTION!");
-        }
+
+    public static void saveToFileMenu() {
+        while (true) {
+            System.out.println("""
+                    1 - SAVE USERS TO FILE
+                    2 - SAVE VEHICLES TO FILE
+                    3 - SAVE ROUTES TO FILE
+                    4 - SAVE TRIPS TO FILE
+                    5 - SAVE TICKETS TO FILE   
+                    0 - BACK
+                    """);
+            int option = Integer.parseInt(sc.nextLine());
+            if (option == 1) {
+                List<User> listUsers = Services.saveUsers(em);
+                writeListOfUsersToFile(listUsers, "./files/user/");
+            } else if (option == 2) {
+                List<Vehicle> vehicles = Services.saveVehicles(em);
+                writeListOfVehiclesToFile(vehicles, "./files/vehicle/");
+            } else if (option == 3) {
+                List<Route> listRoutes = Services.saveRoutes(em);
+                writeListOfRoutesToFile(listRoutes, "./files/routes/");
+            } else if (option == 4) {
+                List<Trip> listTrips = Services.saveTrips(em);
+                writeListOfTripsToFile(listTrips, "./files/trips/");
+            } else if (option == 5) {
+                List<Ticket> listTickets = Services.saveTickets(em);
+                writeListOfTicketToFile(listTickets, "./files/tickets/");
+            } else if (option == 0) {
+                break;
+            } else {
+                log.info("INVALID OPTION!");
+            }
         }
     }
-    public static void searchTicketByDistributorMenu(){
+
+    public static void searchTicketByDistributorMenu() {
         Services.displayDistributors(em);
         System.out.print("PLEASE, INSERT DISTRIBUTOR ID : ");
         long distributor_id = Long.parseLong(sc.nextLine());
         DistributorDAO distributorDAO = new DistributorDAO(em);
         Distributor distributor = distributorDAO.getFinById(distributor_id);
-        Reports.searchTicketByDistributor(distributor,em);
+        Reports.searchTicketByDistributor(distributor, em);
+    }
+
+    public static void newPasswordMenu(Services services,EntityManager em) {
+        for (int i = 0; i < 3; i++) {
+            System.out.print("INSERT CURRENT PASSWORD : ");
+            String currentPassword = sc.nextLine();
+            if (loggedinUser.getPassword().equals(currentPassword)) {
+                System.out.print("INSERT NEW PASSWORD : ");
+                String newPassword = sc.nextLine();
+                services.changePassword(loggedinUser, newPassword,em);
+                log.info("YOUR PASSWORD CHANGED SUCCESSFULLY ☑️");
+                break;
+            } else {
+                log.error("INVALID PASSWORD ❌");
+            }
+        }
     }
 }

@@ -328,4 +328,15 @@ public class Services {
         List<Ticket> tickets = em.createQuery("FROM Ticket", Ticket.class).getResultList();
         return tickets;
     }
+    public static void changePassword(User user, String newPassword,EntityManager em){
+        try {
+            User user2 = new User(user.getId(), user.getName(), user.getSurname(), newPassword, user.getCardNumber(), user.isAdmin(),user.getTickets());
+            em.getTransaction().begin();
+            em.persist(user2);
+            em.getTransaction().commit();
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

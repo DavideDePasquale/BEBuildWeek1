@@ -38,6 +38,17 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+        System.out.println("CIAOOOO" + this.password);
+    }
+
+    public User(long id, String name, String surname, String password, String cardNumber, boolean isAdmin, List<Ticket> tickets) {
+        this.id = id;
+        this.name = name;
+        this.surname = surname;
+        this.password = password;
+        this.cardNumber = cardNumber;
+        this.isAdmin = isAdmin;
+        this.tickets = tickets;
     }
 
     public long getId
