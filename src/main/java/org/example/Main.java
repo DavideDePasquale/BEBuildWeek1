@@ -52,6 +52,7 @@ public class Main {
     }
 
     private static void deleteVehicle(Scanner sc, Services services, EntityManager em) {
+        Services.displayVehicles(em);
         System.out.print("Enter Vehicle id : ");
         long id = sc.nextLong();
         sc.nextLine();
@@ -61,6 +62,7 @@ public class Main {
     }
 
     private static void deleteRoute(Scanner sc, Services services, EntityManager em) {
+        Services.displayRoutes(em);
         System.out.print("Enter Route id : ");
         long id = sc.nextLong();
         sc.nextLine();
@@ -70,6 +72,7 @@ public class Main {
     }
 
     private static void deleteTicket(Scanner sc, Services services, EntityManager em) {
+        Services.displayTickets(em);
         System.out.print("Enter Ticket id : ");
         long id = sc.nextLong();
         sc.nextLine();
@@ -79,6 +82,7 @@ public class Main {
     }
 
     private static void deleteDistributor(Scanner sc, Services services, EntityManager em) {
+        Services.displayDistributors(em);
         System.out.print("Enter Distributor id : ");
         long id = sc.nextLong();
         sc.nextLine();
@@ -88,6 +92,7 @@ public class Main {
     }
 
     private static void deleteUser(Scanner sc, Services services, EntityManager em) {
+        Services.displayUsers(em);
         System.out.print("Enter User id : ");
         long id = sc.nextLong();
         sc.nextLine();
@@ -176,7 +181,7 @@ public class Main {
     }
 
     private static void addVehicle(Scanner sc, Services services) {
-        System.out.print("Please enter Vehicle type (BUS, TRAM or TRAIN) : ");
+        System.out.print("Please enter Vehicle type (BUS, TRAM, TRAIN, NATIONAL_BUS or TRAIN_ITALO) : ");
         VehicleType type = VehicleType.valueOf(sc.nextLine().toUpperCase());
         System.out.print("Enter capacity : ");
         int capacity = sc.nextInt();
@@ -328,6 +333,7 @@ public class Main {
                 int option = Integer.parseInt(sc.nextLine());
                 switch (option) {
                     case 1: {
+
                         deleteUser(sc, services, em);
                         break;
                     }
@@ -395,7 +401,7 @@ public class Main {
                         break;
                     }
                     case 5: {
-                        services.displayTickets();
+                        services.displayTickets(em);
                         break;
                     }
                     case 6: {
@@ -450,10 +456,12 @@ public class Main {
                 } else {
                     log.error("INVALID NUMBER! TRY AGAIN");
                 }
+
             } catch (RuntimeException e) {
                 log.error("INVALID OPTION!");
             }
         }
+
     }
 
     public static void userMenu(Scanner sc, User loggedinUser, Services services, EntityManager em) {
@@ -686,6 +694,8 @@ public class Main {
                     routeModifyMenu();
                 } else if (option ==5) {
                     vehicleModifyMenu();
+                } else if(option == 0){
+                    break;
                 }
             } catch (Exception e) {
                 throw new RuntimeException(e);

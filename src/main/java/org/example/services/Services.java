@@ -175,7 +175,7 @@ public class Services {
             throw new RuntimeException(e);
         }
     }
-    public void displayTickets(){
+    public static void displayTickets(EntityManager em){
         try {
             List<Ticket> tickets = em.createQuery("FROM Ticket", Ticket.class).getResultList();
             tickets.forEach(System.out::println);
