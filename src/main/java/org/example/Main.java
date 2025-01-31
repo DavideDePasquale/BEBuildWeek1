@@ -39,7 +39,7 @@ public class Main {
         Services services = new Services(em);
 
         if (loggedinUser != null) {
-            System.out.println("Login Successfull!!!");
+            System.out.println("Login Successfully🥳");
 
             if (loggedinUser.isAdmin()) {
                 adminMenu(sc, services, em);
@@ -47,7 +47,7 @@ public class Main {
                 userMenu(sc, loggedinUser, services, em);
             }
         } else {
-            System.out.print("Login failed");
+            System.out.print("Login failed❌");
         }
     }
 
@@ -678,6 +678,14 @@ public class Main {
                 int option = Integer.parseInt(sc.nextLine());
                 if ( option == 1 ){
                     modifyUserMenu();
+                } else if (option == 2) {
+                    distributorModifyMenu();
+                } else if (option == 3) {
+                    tripModifyMenu();
+                } else if (option == 4) {
+                    routeModifyMenu();
+                } else if (option ==5) {
+                    vehicleModifyMenu();
                 }
             } catch (Exception e) {
                 throw new RuntimeException(e);
@@ -832,11 +840,219 @@ public class Main {
                         log.error("INVALID OPTION ❌");
                         break;
                     }
+                } else  if(option == 0 ){
+                    break;
                 }
 
             }catch (RuntimeException e){
                 log.error("INVALID OPTION ❌");
 
+            }
+        }
+    }
+    public static void tripModifyMenu(){
+        while (true) {
+            try {
+                System.out.println("-------------------------------------------------------------------------");
+                Services.displayTrips(em);
+                System.out.print("INSERT TRIP ID : ");
+                long trip_id = Long.parseLong(sc.nextLine());
+                TripDAO tripDAO = new TripDAO(em);
+                Trip trip = tripDAO.getFinById(trip_id);
+                System.out.println("TRIP INFORMATION : " + trip);
+                System.out.print("""
+                   --------------------------------------------------------------------------------------
+                    1 - VEHICLE
+                    2 - ROUTE
+                    3 - START-TIME
+                    4 - END-TIME
+                    0 - BACK
+                    CHOSE ONE OF THIS OPTION : """);
+                int option = Integer.parseInt(sc.nextLine());
+                if (option == 1) {
+                    System.out.println("CURRENT VEHICLE : " + trip.getVehicle());
+                    Services.displayVehicles(em);
+                    System.out.print("SELECT VEHICLE ID : ");
+                    long vehicle_id = Long.parseLong(sc.nextLine());
+                    VehicleDAO vehicleDAO = new VehicleDAO(em);
+                    Vehicle vehicle = vehicleDAO.getFinById(vehicle_id);
+                    tripDAO.modifyVehicle(trip,vehicle);
+                    log.info("VEHICLE CHANGED!☑️");
+                    break;
+                } else if (option == 2) {
+                    System.out.println("CURRENT ROUTE : " + trip.getRoute());
+                    Services.displayRoutes(em);
+                    System.out.print("INSERT NEW ROUTE ID : ");
+                    long newRouteId = Long.parseLong(sc.nextLine());
+                    RouteDAO routeDAO = new RouteDAO(em);
+                    Route route = routeDAO.getFinById(newRouteId);
+                    tripDAO.modifyRoute(trip,route);
+                    log.info("ROUTE CHANGED ☑️");
+                    break;
+                }
+                else if (option == 3) {
+                    System.out.println("CURRENT START-TIME : " + trip.getStartTime());
+                    System.out.print("INSERT NEW START-TIME : ");
+                    LocalDateTime newStartTime = LocalDateTime.parse(sc.nextLine());
+                    tripDAO.modifyStartTime(trip, newStartTime);
+                    log.info("START-TIME CHANGED ☑️");
+                    break;
+                }
+                else if (option == 4) {
+                    System.out.println("CURRENT END-TIME : " + trip.getEndTime());
+                    System.out.print("INSERT NEW END-TIME : ");
+                    LocalDateTime newEndTime = LocalDateTime.parse(sc.nextLine());
+                    tripDAO.modifyStartTime(trip, newEndTime);
+                    log.info("END-TIME CHANGED ☑️");
+                    break;
+                } else  if(option == 0 ){
+                    break;
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+    public static void routeModifyMenu() {
+        while (true) {
+            try {
+                System.out.println("-------------------------------------------------------------------------");
+                Services.displayRoutes(em);
+                System.out.print("INSERT ROUTE ID : ");
+                long route_id = Long.parseLong(sc.nextLine());
+                RouteDAO routeDAO = new RouteDAO(em);
+                Route route = routeDAO.getFinById(route_id);
+                System.out.println("ROUTE INFORMATION : " + route);
+                System.out.print("""
+                        --------------------------------------------------------------------------------------
+                         1 - VEHICLE
+                         2 - START-POINT
+                         3 - END-POINT
+                         4 - ESTIMATED DURATION
+                         0 - BACK
+                         CHOSE ONE OF THIS OPTION : """);
+                int option = Integer.parseInt(sc.nextLine());
+                if (option == 1) {
+                    System.out.println("CURRENT VEHICLE : " + route.getVehicle());
+                    Services.displayVehicles(em);
+                    System.out.print("SELECT VEHICLE ID : ");
+                    long vehicle_id = Long.parseLong(sc.nextLine());
+                    VehicleDAO vehicleDAO = new VehicleDAO(em);
+                    Vehicle vehicle = vehicleDAO.getFinById(vehicle_id);
+                    routeDAO.modifyVehicle(route,vehicle);
+                    log.info("VEHICLE CHANGED!☑️");
+                    break;
+                } else if (option == 2) {
+                    System.out.print("CURRENT START-POINT : " + route.getStartPoint());
+                    System.out.print("INSERT NEW START-POINT : ");
+                    String newStartPoint = sc.nextLine();
+                    routeDAO.modifyStartPoint(route,newStartPoint);
+                    log.info("START-POINT CHANGED!☑️");
+                    break;
+                } else if (option == 3) {
+                    System.out.print("CURRENT END-POINT : " + route.getEndPoint());
+                    System.out.print("INSERT NEW END-POINT : ");
+                    String newEndPoint = sc.nextLine();
+                    routeDAO.modifyEndPoint(route,newEndPoint);
+                    log.info("END-POINT CHANGED!☑️");
+                    break;
+                } else if (option == 4){
+                    System.out.println("CURRENT ESTIMATED DURATION : " + route.getEstimatedDuration());
+                    System.out.print("INSERT NEW ESTIMATED DURATION : ");
+                    int newEstimatedDuration = Integer.parseInt(sc.nextLine());
+                    routeDAO.modifyEstimatedDuration(route,newEstimatedDuration);
+                    log.info("ESTIMATED DURATION CHANGED!☑️");
+                    break;
+                } else if (option == 0) {
+                   break;
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+    public static void vehicleModifyMenu(){
+        while (true) {
+            try {
+                System.out.println("-------------------------------------------------------------------------");
+                Services.displayVehicles(em);
+                System.out.print("INSERT VEHICLE ID : ");
+                long vehicle_id = Long.parseLong(sc.nextLine());
+                VehicleDAO vehicleDAO = new VehicleDAO(em);
+                Vehicle vehicle = vehicleDAO.getFinById(vehicle_id);
+                System.out.println("VEHICLE INFORMATION : " + vehicle);
+                System.out.print("""
+                        --------------------------------------------------------------------------------------
+                         1 - TYPE VEHICLE
+                         2 - CAPACITY 
+                         3 - STATUS VEHICLE
+                         0 - BACK
+                         CHOSE ONE OF THIS OPTION : """);
+                int option = Integer.parseInt(sc.nextLine());
+                if (option == 1) {
+                    System.out.println("CURRENT TYPE VEHICLE : " + vehicle.getType());
+                    System.out.print("""
+                            1 - BUS
+                            2 - TRAM
+                            3 - TRAIN
+                            4 - NATIONAL_BUS
+                            5 - TRAIN_ITALO
+                            0 - BACK
+                            CHOSE ONE OF THIS OPTION : """);
+                    int type_option = Integer.parseInt(sc.nextLine());
+                    if (type_option == 1){
+                        vehicleDAO.modifyTypesVehicle(vehicle,VehicleType.BUS);
+                        log.info("VEHICLE TYPE IS CHANGED!🎉");
+                        break;
+                    } else if (type_option == 2) {
+                        vehicleDAO.modifyTypesVehicle(vehicle,VehicleType.TRAM);
+                        log.info("VEHICLE TYPE IS CHANGED!🎉");
+                        break;
+                    } else if (type_option == 3) {
+                        vehicleDAO.modifyTypesVehicle(vehicle,VehicleType.TRAIN);
+                        log.info("VEHICLE TYPE IS CHANGED!🎉");
+                        break;
+                    } else if (type_option == 4) {
+                        vehicleDAO.modifyTypesVehicle(vehicle,VehicleType.NATIONAL_BUS);
+                        log.info("VEHICLE TYPE IS CHANGED!🎉");
+                        break;
+                    } else if (type_option == 5) {
+                        vehicleDAO.modifyTypesVehicle(vehicle,VehicleType.TRAIN_ITALO);
+                        log.info("VEHICLE TYPE IS CHANGED!🎉");
+                        break;
+                    } else if (type_option == 0) {
+                        break;
+                    }
+                }  else if (option == 2) {
+                    System.out.println("CURRENT VEHICLE CAPACITY : " + vehicle.getCapacity());
+                    System.out.print("INSERT NEW VEHICLE CAPACITY : ");
+                    int newCapacity = Integer.parseInt(sc.nextLine());
+                    vehicleDAO.modifyCapacity(vehicle, newCapacity);
+                    log.info("VEHICLE CAPACITY CHANGED!☑️");
+                    break;
+                }  else if (option == 3) {
+                    System.out.println("CURRENT VEHICLE STATUS : " + vehicle.getStatus());
+
+                    System.out.print("""
+                            1 - MAINTENANCE 
+                            2 - ACTIVE
+                            0 - BACK
+                            SELECT NEW VEHICLE STATUS ID : """);
+                         int status_id = Integer.parseInt(sc.nextLine());
+                         if(status_id == 1){
+                             vehicleDAO.modifyStatusVehicle(vehicle,VehicleStatus.MAINTENANCE);
+                             log.info("NEW VEHICLE TYPE : MAINTENANCE🔧");
+                         } else if (status_id == 2){
+                             vehicleDAO.modifyStatusVehicle(vehicle,VehicleStatus.ACTIVE);
+                             log.info("NEW VEHICLE TYPE : ACTIVE👍");
+                         } else if(status_id == 0 ){
+                             break;
+                         } else {
+                             log.error("INVALID OPTION!❌");
+                         }
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
         }
     }

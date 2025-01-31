@@ -133,7 +133,7 @@ public class Services {
         }
     }
 
-    public void displayRoutes(EntityManager em) {
+    public static void displayRoutes(EntityManager em) {
         try {
             List<Route> routes = em.createQuery("FROM Route", Route.class).getResultList();
             routes.forEach(System.out::println);
@@ -141,7 +141,7 @@ public class Services {
             log.error("Non è possibile visualizzare le tratte", e);
         }
     }
-    public void displayTrips(EntityManager em){
+    public static void displayTrips(EntityManager em){
         try {
             List<Trip> trips = em.createQuery("FROM Trip", Trip.class).getResultList();
             trips.forEach(System.out::println);

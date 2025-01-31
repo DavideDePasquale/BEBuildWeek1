@@ -1,6 +1,9 @@
 package org.example.DAO;
 
+import org.example.entities.Route;
 import org.example.entities.Vehicle;
+import org.example.enumeration.VehicleStatus;
+import org.example.enumeration.VehicleType;
 
 import javax.persistence.EntityManager;
 
@@ -21,6 +24,24 @@ public class VehicleDAO {
     public void delete(Vehicle vehicle){
         em.getTransaction().begin();
         em.remove(vehicle);
+        em.getTransaction().commit();
+    }
+    public void modifyTypesVehicle(Vehicle vehicle, VehicleType type){
+        em.getTransaction().begin();
+        vehicle.setType(type);
+        em.merge(vehicle);
+        em.getTransaction().commit();
+    }
+    public void modifyCapacity(Vehicle vehicle, int capacity){
+        em.getTransaction().begin();
+        vehicle.setCapacity(capacity);
+        em.merge(vehicle);
+        em.getTransaction().commit();
+    }
+    public void modifyStatusVehicle(Vehicle vehicle, VehicleStatus status){
+        em.getTransaction().begin();
+        vehicle.setStatus(status);
+        em.merge(vehicle);
         em.getTransaction().commit();
     }
 }
