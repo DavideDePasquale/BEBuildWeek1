@@ -10,6 +10,7 @@ import org.example.enumeration.VehicleStatus;
 import org.example.enumeration.VehicleType;
 import org.example.services.Reports;
 import org.example.services.Services;
+import org.postgresql.gss.GSSOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -200,8 +201,10 @@ public class Main {
         Route route = routeDAO.getFinById(route_id);
         System.out.print("Please, select Start Time : ");
         LocalDateTime startTime = LocalDateTime.parse(sc.nextLine());
+
         System.out.print("Please, select End Time : ");
         LocalDateTime endTime = LocalDateTime.parse(sc.nextLine());
+
         Trip trip = new Trip(vehicle, route, startTime, endTime);
         services.addTrip(trip);
     }
@@ -218,7 +221,7 @@ public class Main {
             return;
         }
 
-        services.displayDistributors(em);
+        services.displayActiveDistributors(true);
         System.out.print("SELECT DISTRIBUTOR ID : ");
         int distributor_id = Integer.parseInt(sc.nextLine());
         DistributorDAO distributorDAO = new DistributorDAO(em);
@@ -419,9 +422,10 @@ public class Main {
                         1 - ADD ITEMS
                         2 - DELETE ITEMS
                         3 - DISPLAY ITEMS
-                        4 - REPORTS
-                        5 - SAVE TO FILE
-                        6 - CHANGE USERS PASSWORD
+                        4 - MODIFY ITEMS
+                        5 - REPORTS
+                        6 - SAVE TO FILE
+                        7 - CHANGE USERS PASSWORD                       
                         0 - EXIT
                         """);
                 int option = Integer.parseInt(sc.nextLine());
@@ -431,11 +435,13 @@ public class Main {
                     deleteMenu(sc, services, em);
                 } else if (option == 3) {
                     displayMenu(sc, services, em);
-                } else if (option == 4) {
-                    reportsMenu(services);
+                } else if (option ==4) {
+                    modifyUserMenu();
                 } else if (option == 5) {
-                    saveToFileMenu();
+                    reportsMenu(services);
                 } else if (option == 6) {
+                    saveToFileMenu();
+                } else if (option == 7) {
                     newPasswordAdminMenu(em);
                 } else if (option == 0) {
                     System.out.println("EXITING");
@@ -523,9 +529,11 @@ public class Main {
 
             } else if (option == 4) {
                 searchTicketByDistributorMenu();
+                break;
 
             } else if (option == 5) {
-                vehiclesInMaintenance();
+                vehiclesInMaintenance(em);
+                break;
             } else if (option == 0) {
                 break;
 
@@ -650,6 +658,96 @@ public class Main {
             User user = userDAO.getFinById(user_id);
             Services.changePassword(user,newPassword,em);
             log.info("USER PASSWORD CHANGED SUCCESSFULLY ☑️");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void modifyMenu(){
+        while (true) {
+            try {
+                System.out.println("""
+                    1 - USER MODIFY
+                    2 - DISTRIBUTOR MODIFY
+                    3 - TRIP MODIFY
+                    4 - ROUTE MODIFY
+                    5 - VEHICLE MODIFY
+                    0 - BACK            
+                    """);
+                int option = Integer.parseInt(sc.nextLine());
+                if ( option == 1 ){
+                    modifyUserMenu();
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+
+        }
+    }
+    public static void modifyUserMenu(){
+        try {
+            Services.displayUsers(em);
+            System.out.print("INSERT USER ID : ");
+            long user_id = Long.parseLong(sc.nextLine());
+            UserDAO userDAO = new UserDAO(em);
+            User user = userDAO.getFinById(user_id);
+            System.out.println("THIS IS USER : " + user);
+            System.out.print("""
+                   --------------------------------------------------------------------------------------
+                    1 - NAME
+                    2 - SURNAME 
+                    3 - PASSWORD
+                    4 - CARD NUMBER 
+                    5 - ROLE (USER OR ADMIN)
+                    0 - BACK
+                    CHOSE ONE OF THIS OPTION :   """);
+            int option = Integer.parseInt(sc.nextLine());
+            while (true) {
+                if (option == 1) {
+                    System.out.println("CURRENT NAME : " + user.getName());
+                    System.out.print("INSERT NEW NAME : ");
+                    String newName = sc.nextLine();
+                    userDAO.modifyName(user, newName);
+                    log.info("NAME CHANGED ☑️");
+                    break;
+                } else if (option == 2) {
+                    System.out.println("CURRENT SURNAME : " + user.getSurname());
+                    System.out.print("INSERT NEW SURNAME : ");
+                    String newSurname = sc.nextLine();
+                    userDAO.modifySurname(user, newSurname);
+                    log.info("SURNAME CHANGED ☑️");
+                    break;
+                } else if (option == 3) {
+                    System.out.println("CURRENT PASSWORD : " + user.getPassword());
+                    System.out.print("INSERT NEW PASSWORD : ");
+                    String newPassword = sc.nextLine();
+                    userDAO.modifyPassword(user, newPassword);
+                    log.info("PASSWORD CHANGED ☑️");
+                    break;
+                } else if (option == 4) {
+                    System.out.println("CURRENT CARD NUMBER : " + user.getCardNumber());
+                    String newCardNumber = codeGenerator(em);
+                    userDAO.modifyCardNumber(user, newCardNumber);
+                    log.info("CARD NUMBER CHANGED! THIS IS NEW CARD NUMBER : " + newCardNumber);
+                    break;
+                } else if (option == 5) {
+                    System.out.println("CURRENT ROLE IS : " + user.isAdmin());
+                    System.out.print("IS HE/SHE ADMIN? ( Y / N ) : ");
+                    String isAdminChar = sc.nextLine();
+                    if (isAdminChar.equals("Y")) {
+                        userDAO.modifyRole(user, true);
+                        break;
+                    } else if (isAdminChar.equals("N")) {
+                        userDAO.modifyRole(user, false);
+                        break;
+                    } else {
+                        log.error("INVALID OPTION ❌");
+                        break;
+                    }
+                } else if (option == 0 ) {
+                      break;
+                }
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

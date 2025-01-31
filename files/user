@@ -1,4 +1,7 @@
 User{id=1, name='Mahdi', surname='Nazari', password='Mahdi123', cardNumber='1234AB234', isAdmin=true}
-User{id=2, name='Davide', surname='Alonzi', password='Alonzi123', cardNumber='ABC1234', isAdmin=false}
-User{id=4, name='Zidane', surname='Zinedine', password='Eccepcion123', cardNumber='ZIZ234ECC', isAdmin=false}
 User{id=5, name='Matteo', surname='Caschetto', password='Matteo123', cardNumber='MC12345', isAdmin=true}
+User{id=2, name='Davide', surname='Alonzi', password='Alonzi123', cardNumber='ABC1234', isAdmin=true}
+User{id=6, name='Eleonora', surname='Ronchini', password='Eleonora123', cardNumber='', isAdmin=true}
+User{id=7, name='Davide', surname='De Pasquale', password='Depa1998', cardNumber='DD3456DE', isAdmin=true}
+User{id=4, name='Zinedine', surname='Zidane', password='Zidane123', cardNumber='ZIZ234ECC', isAdmin=false}
+User{id=8, name='Umberto', surname='Emanuele', password='Emanuele123', cardNumber='AB4521EF', isAdmin=false}

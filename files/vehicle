@@ -3,3 +3,6 @@ Vehicle{id=3, type=TRAM, capacity=145, status=ACTIVE}
 Vehicle{id=2, type=BUS, capacity=50, status=MAINTENANCE}
 Vehicle{id=4, type=BUS, capacity=100, status=ACTIVE}
 Vehicle{id=5, type=TRAIN, capacity=500, status=ACTIVE}
+Vehicle{id=6, type=NATIONAL_BUS, capacity=60, status=ACTIVE}
+Vehicle{id=7, type=TRAIN, capacity=200, status=ACTIVE}
+Vehicle{id=8, type=TRAIN_ITALO, capacity=1500, status=ACTIVE}

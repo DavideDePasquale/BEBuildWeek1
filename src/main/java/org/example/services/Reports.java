@@ -75,9 +75,9 @@ public class Reports {
         }
 
     }
-   public static void vehiclesInMaintenance(){
+   public static void vehiclesInMaintenance(EntityManager em){
         try {
-            List<Vehicle> vehiclesInMaintenance = em.createQuery("SELECT v FROM Vehicle v WHERE v.status = :MAINTENANCE", Vehicle.class).setParameter("MAINTENANCE", VehicleStatus.MAINTENANCE).getResultList();
+            List<Vehicle> vehiclesInMaintenance = em.createQuery("SELECT v FROM Vehicle v WHERE v.status = :status", Vehicle.class).setParameter("status", VehicleStatus.MAINTENANCE).getResultList();
             vehiclesInMaintenance.forEach(System.out::println);
         } catch (Exception e) {
             throw new RuntimeException(e);

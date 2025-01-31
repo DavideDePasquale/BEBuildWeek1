@@ -1,5 +1,22 @@
-Route{id=6, startPoint='Bari', endPoint='Roma', estimatedDuration=240, vehicle=Vehicle{id=2, type=BUS, capacity=50, status=MAINTENANCE}}
-Route{id=1, startPoint='Bari', endPoint='Roma', estimatedDuration=240, vehicle=Vehicle{id=3, type=TRAM, capacity=145, status=ACTIVE}}
-Route{id=2, startPoint='Bari', endPoint='Roma', estimatedDuration=240, vehicle=Vehicle{id=1, type=BUS, capacity=50, status=ACTIVE}}
-Route{id=7, startPoint='Bari', endPoint='Napoli', estimatedDuration=180, vehicle=Vehicle{id=2, type=BUS, capacity=50, status=MAINTENANCE}}
-Route{id=8, startPoint='Roma', endPoint='Milano', estimatedDuration=285, vehicle=Vehicle{id=3, type=TRAM, capacity=145, status=ACTIVE}}
+Route{id=1, startPoint='Laurentina', endPoint='Trastevere', estimatedDuration=25, vehicle=Vehicle{id=3, type=TRAM, capacity=145, status=ACTIVE}}
+Route{id=2, startPoint='Stazione Tiburtina', endPoint='Termini', estimatedDuration=20, vehicle=Vehicle{id=3, type=TRAM, capacity=145, status=ACTIVE}}
+Route{id=6, startPoint='Stazione Tiburtina', endPoint='Arco di Travertino', estimatedDuration=34, vehicle=Vehicle{id=1, type=BUS, capacity=50, status=ACTIVE}}
+Route{id=7, startPoint='Basilica San Paolo', endPoint='Piazza Venezia', estimatedDuration=40, vehicle=Vehicle{id=2, type=BUS, capacity=50, status=MAINTENANCE}}
+Route{id=8, startPoint='Piazza Re Di Roma', endPoint='Arco Acquedotti', estimatedDuration=20, vehicle=Vehicle{id=3, type=TRAM, capacity=145, status=ACTIVE}}
+Route{id=9, startPoint='Lago Prenesse', endPoint='Termini', estimatedDuration=30, vehicle=Vehicle{id=1, type=BUS, capacity=50, status=ACTIVE}}
+Route{id=10, startPoint='Roma Tuscolana', endPoint='Roma Fiumicino', estimatedDuration=30, vehicle=Vehicle{id=7, type=TRAIN, capacity=200, status=ACTIVE}}
+Route{id=11, startPoint='Roma Fiumicino', endPoint='Stazione Termini', estimatedDuration=40, vehicle=Vehicle{id=7, type=TRAIN, capacity=200, status=ACTIVE}}
+Route{id=12, startPoint='Stadio Olimpico', endPoint='Roma Nomentana', estimatedDuration=50, vehicle=Vehicle{id=2, type=BUS, capacity=50, status=MAINTENANCE}}
+Route{id=14, startPoint='Milano', endPoint='Roma', estimatedDuration=240, vehicle=Vehicle{id=8, type=TRAIN_ITALO, capacity=1500, status=ACTIVE}}
+Route{id=15, startPoint='Firenze', endPoint='Roma', estimatedDuration=90, vehicle=Vehicle{id=8, type=TRAIN_ITALO, capacity=1500, status=ACTIVE}}
+Route{id=16, startPoint='Verona', endPoint='Roma', estimatedDuration=200, vehicle=Vehicle{id=8, type=TRAIN_ITALO, capacity=1500, status=ACTIVE}}
+Route{id=17, startPoint='Roma', endPoint='Verona', estimatedDuration=200, vehicle=Vehicle{id=8, type=TRAIN_ITALO, capacity=1500, status=ACTIVE}}
+Route{id=18, startPoint='Roma', endPoint='Firenze', estimatedDuration=90, vehicle=Vehicle{id=8, type=TRAIN_ITALO, capacity=1500, status=ACTIVE}}
+Route{id=19, startPoint='Roma', endPoint='Milano', estimatedDuration=240, vehicle=Vehicle{id=8, type=TRAIN_ITALO, capacity=1500, status=ACTIVE}}
+Route{id=20, startPoint='Sora', endPoint='Roma', estimatedDuration=180, vehicle=Vehicle{id=6, type=NATIONAL_BUS, capacity=60, status=ACTIVE}}
+Route{id=21, startPoint='Ostia', endPoint='Roma', estimatedDuration=60, vehicle=Vehicle{id=5, type=TRAIN, capacity=500, status=ACTIVE}}
+Route{id=22, startPoint='Roma', endPoint='Ostia', estimatedDuration=60, vehicle=Vehicle{id=5, type=TRAIN, capacity=500, status=ACTIVE}}
+Route{id=23, startPoint='Roma', endPoint='Sora', estimatedDuration=180, vehicle=Vehicle{id=6, type=NATIONAL_BUS, capacity=60, status=ACTIVE}}
+Route{id=24, startPoint='Bari', endPoint='Roma', estimatedDuration=280, vehicle=Vehicle{id=8, type=TRAIN_ITALO, capacity=1500, status=ACTIVE}}
+Route{id=25, startPoint='Roma', endPoint='Bari', estimatedDuration=280, vehicle=Vehicle{id=8, type=TRAIN_ITALO, capacity=1500, status=ACTIVE}}
+Route{id=13, startPoint='Napoli', endPoint='Roma', estimatedDuration=60, vehicle=Vehicle{id=8, type=TRAIN_ITALO, capacity=1500, status=ACTIVE}}
