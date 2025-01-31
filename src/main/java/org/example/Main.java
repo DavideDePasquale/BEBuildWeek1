@@ -241,6 +241,7 @@ public class Main {
         Scanner sc = new Scanner(System.in);
         User authorizateUser = null;
         for (int i = 0; i < 3; i++) {
+            System.out.println("---------------TEAM 4 ---------------------------------");
             System.out.print("Enter User name : ");
             String name = sc.nextLine();
             System.out.print("Enter User password : ");
@@ -436,7 +437,7 @@ public class Main {
                 } else if (option == 3) {
                     displayMenu(sc, services, em);
                 } else if (option ==4) {
-                    modifyUserMenu();
+                    modifyMenu();
                 } else if (option == 5) {
                     reportsMenu(services);
                 } else if (option == 6) {
@@ -685,13 +686,15 @@ public class Main {
         }
     }
     public static void modifyUserMenu(){
+        while (true) {
         try {
+            System.out.println("-------------------------------------------------------------------------");
             Services.displayUsers(em);
             System.out.print("INSERT USER ID : ");
             long user_id = Long.parseLong(sc.nextLine());
             UserDAO userDAO = new UserDAO(em);
             User user = userDAO.getFinById(user_id);
-            System.out.println("THIS IS USER : " + user);
+            System.out.println("USER INFORMATION : " + user);
             System.out.print("""
                    --------------------------------------------------------------------------------------
                     1 - NAME
@@ -702,7 +705,7 @@ public class Main {
                     0 - BACK
                     CHOSE ONE OF THIS OPTION :   """);
             int option = Integer.parseInt(sc.nextLine());
-            while (true) {
+
                 if (option == 1) {
                     System.out.println("CURRENT NAME : " + user.getName());
                     System.out.print("INSERT NEW NAME : ");
@@ -710,6 +713,7 @@ public class Main {
                     userDAO.modifyName(user, newName);
                     log.info("NAME CHANGED ☑️");
                     break;
+
                 } else if (option == 2) {
                     System.out.println("CURRENT SURNAME : " + user.getSurname());
                     System.out.print("INSERT NEW SURNAME : ");
@@ -734,22 +738,106 @@ public class Main {
                     System.out.println("CURRENT ROLE IS : " + user.isAdmin());
                     System.out.print("IS HE/SHE ADMIN? ( Y / N ) : ");
                     String isAdminChar = sc.nextLine();
-                    if (isAdminChar.equals("Y")) {
+                    if (isAdminChar.toUpperCase().equals("Y")) {
                         userDAO.modifyRole(user, true);
+                        log.info("The role is changed!");
                         break;
-                    } else if (isAdminChar.equals("N")) {
+                    } else if (isAdminChar.toUpperCase().equals("N")) {
                         userDAO.modifyRole(user, false);
+                        log.info("The role is changed!");
                         break;
                     } else {
                         log.error("INVALID OPTION ❌");
                         break;
                     }
                 } else if (option == 0 ) {
+                    System.out.println("-----------------------------------------------------------------");
                       break;
                 }
-            }
-        } catch (Exception e) {
+            }catch (Exception e) {
             throw new RuntimeException(e);
+        }
+        }
+    }
+
+    public static void distributorModifyMenu(){
+        while (true){
+            try{
+                System.out.println("-------------------------------------------------------------------------");
+                Services.displayDistributors(em);
+                System.out.print("INSERT DISTRIBUTOR ID : ");
+                long distributor_id = Long.parseLong(sc.nextLine());
+                DistributorDAO distributorDAO = new DistributorDAO(em);
+                Distributor distributor = distributorDAO.getFinById(distributor_id);
+                System.out.println("DISTRIBUTOR INFORMATION : " + distributor);
+                System.out.print("""
+                   --------------------------------------------------------------------------------------
+                    1 - TYPE
+                    2 - NAME
+                    3 - LOCATION
+                    4 - STATUS
+                    0 - BACK
+                    CHOSE ONE OF THIS OPTION : """);
+                int option = Integer.parseInt(sc.nextLine());
+                if (option == 1) {
+                    System.out.println("CURRENT TYPE : " + distributor.getType());
+                    System.out.print("""
+                                        SELECT NEW TYPE : 
+                                        1-AUTOMATIC
+                                        2-AUTHORIZED""");
+                    int type = Integer.parseInt(sc.nextLine());
+                    if(type == 1){
+                        distributorDAO.modifyType(distributor,DistributorType.AUTOMATIC);
+                        log.info("TYPE CHANGED ☑️");
+                        break;
+                    } else if (type == 2) {
+                        distributorDAO.modifyType(distributor,DistributorType.AUTHORIZED);
+                        log.info("TYPE CHANGED ☑️");
+                        break;
+                    }
+                   else {
+                       log.error("INVALID OPTION!");
+                       break;
+                    }
+                }
+                else if (option == 2) {
+                    System.out.println("CURRENT NAME : " + distributor.getName());
+                    System.out.print("INSERT NEW NAME : ");
+                    String newName = sc.nextLine();
+                    distributorDAO.modifyName(distributor, newName);
+                    log.info("NAME CHANGED ☑️");
+                    break;
+                }
+                else if (option == 3) {
+                    System.out.println("CURRENT LOCATION : " + distributor.getLocation());
+                    System.out.print("INSERT NEW LOCATION : ");
+                    String newSurname = sc.nextLine();
+                    distributorDAO.modifyLocation(distributor, newSurname);
+                    log.info("LOCATION CHANGED ☑️");
+                    break;
+                }
+                else if (option == 4) {
+                    System.out.println("CURRENT STATUS : " + distributor.isActive());
+                    System.out.print("IS IT ACTIVE? ( Y / N ) : ");
+                    String isActive = sc.nextLine();
+                    if (isActive.toUpperCase().equals("Y")) {
+                        distributorDAO.modifyIsActive(distributor, true);
+                        log.info("The status is changed!");
+                        break;
+                    } else if (isActive.toUpperCase().equals("N")) {
+                        distributorDAO.modifyIsActive(distributor, false);
+                        log.info("The status is changed!");
+                        break;
+                    } else {
+                        log.error("INVALID OPTION ❌");
+                        break;
+                    }
+                }
+
+            }catch (RuntimeException e){
+                log.error("INVALID OPTION ❌");
+
+            }
         }
     }
 }
