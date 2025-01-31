@@ -31,16 +31,6 @@ public class User {
         this.cardNumber = cardNumber;
         this.isAdmin = isAdmin;
     }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-        System.out.println("CIAOOOO" + this.password);
-    }
-
     public User(long id, String name, String surname, String password, String cardNumber, boolean isAdmin, List<Ticket> tickets) {
         this.id = id;
         this.name = name;
@@ -49,6 +39,14 @@ public class User {
         this.cardNumber = cardNumber;
         this.isAdmin = isAdmin;
         this.tickets = tickets;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public long getId

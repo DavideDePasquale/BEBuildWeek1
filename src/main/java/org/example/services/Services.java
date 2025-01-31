@@ -124,7 +124,7 @@ public class Services {
         }
     }
 
-    public void displayUsers() {
+    public static void displayUsers(EntityManager em) {
         try {
             List<User> users = em.createQuery("FROM User", User.class).getResultList();
             users.forEach(System.out::println);
@@ -330,10 +330,10 @@ public class Services {
     }
     public static void changePassword(User user, String newPassword,EntityManager em){
         try {
-            User user2 = new User(user.getId(), user.getName(), user.getSurname(), newPassword, user.getCardNumber(), user.isAdmin(),user.getTickets());
-            em.getTransaction().begin();
-            em.persist(user2);
-            em.getTransaction().commit();
+          em.getTransaction().begin();
+          user.setPassword(newPassword);
+          em.merge(user);
+          em.getTransaction().commit();
 
         } catch (Exception e) {
             throw new RuntimeException(e);

@@ -111,7 +111,7 @@ public class Main {
         LocalDateTime issueDate = LocalDateTime.parse(sc.nextLine());
         System.out.print("Enter expire Date (yyyy-MM-dd'T'HH:mm) : ");
         LocalDateTime expireDate = LocalDateTime.parse(sc.nextLine());
-        services.displayUsers();
+        services.displayUsers(em);
         System.out.print("Enter User id : ");
         long userId = sc.nextLong();
         sc.nextLine();
@@ -387,7 +387,7 @@ public class Main {
                         break;
                     }
                     case 4: {
-                        services.displayUsers();
+                        services.displayUsers(em);
                         break;
                     }
                     case 5: {
@@ -416,12 +416,13 @@ public class Main {
         while (true) {
             try {
                 System.out.println("""
-                        1 ADD ITEMS
-                        2 DELETE ITEMS
-                        3 DISPLAY ITEMS
-                        4 REPORTS
-                        5 SAVE TO FILE
-                        0 EXIT
+                        1 - ADD ITEMS
+                        2 - DELETE ITEMS
+                        3 - DISPLAY ITEMS
+                        4 - REPORTS
+                        5 - SAVE TO FILE
+                        6 - CHANGE USERS PASSWORD
+                        0 - EXIT
                         """);
                 int option = Integer.parseInt(sc.nextLine());
                 if (option == 1) {
@@ -434,6 +435,8 @@ public class Main {
                     reportsMenu(services);
                 } else if (option == 5) {
                     saveToFileMenu();
+                } else if (option == 6) {
+                    newPasswordAdminMenu(em);
                 } else if (option == 0) {
                     System.out.println("EXITING");
                     break;
@@ -497,7 +500,7 @@ public class Main {
             int option = sc.nextInt();
             sc.nextLine();
             if (option == 1) {
-                services.displayUsers();
+                services.displayUsers(em);
                 System.out.print("INSERT USER ID : ");
                 long user_id = Long.parseLong(sc.nextLine());
                 UserDAO userDAO = new UserDAO(em);
@@ -621,7 +624,6 @@ public class Main {
         Distributor distributor = distributorDAO.getFinById(distributor_id);
         Reports.searchTicketByDistributor(distributor, em);
     }
-
     public static void newPasswordMenu(Services services,EntityManager em) {
         for (int i = 0; i < 3; i++) {
             System.out.print("INSERT CURRENT PASSWORD : ");
@@ -635,6 +637,21 @@ public class Main {
             } else {
                 log.error("INVALID PASSWORD ❌");
             }
+        }
+    }
+    public static void newPasswordAdminMenu(EntityManager em){
+        try {
+            Services.displayUsers(em);
+            System.out.print("INSERT USER ID : ");
+            long user_id = Long.parseLong(sc.nextLine());
+            System.out.print("INSERT NEW PASSWORD : ");
+            String newPassword = sc.nextLine();
+            UserDAO userDAO = new UserDAO(em);
+            User user = userDAO.getFinById(user_id);
+            Services.changePassword(user,newPassword,em);
+            log.info("USER PASSWORD CHANGED SUCCESSFULLY ☑️");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 }
